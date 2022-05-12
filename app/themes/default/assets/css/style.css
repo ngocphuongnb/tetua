@@ -134,6 +134,10 @@ body.show-menu div.overlay {
 .layout > * {
   padding: var(--layout-gap) 0 0;
 }
+.layout .main {
+  overflow: hidden;
+  min-width: 0;
+}
 
 .layout.two-right {
   grid-template-columns: 2fr 320px;
@@ -650,7 +654,7 @@ ul.messages .error {
 
 .detail pre {
   background: #f6f8fa;
-}
+overflow: auto;max-width: 100%;white-space: pre-wrap;}
 .detail > *:last-child {
   margin-bottom: 0;
 }
@@ -658,7 +662,7 @@ ul.messages .error {
   display: block;
   position: relative;
   background: transparent;
-  padding: 0;
+  padding: .25rem 0;
 }
 .detail pre code[data-language]:before {
   content: attr(data-language);
@@ -882,7 +886,12 @@ article a {
   background-size: contain;
   background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23eceff4" d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z" /></svg>');
 }
-
+.profile .avatar {
+  width: 100px;
+  height: 100px;
+  display: block;
+  margin: 0 auto 20px;
+}
 .author {
   font-weight: 500;
 }

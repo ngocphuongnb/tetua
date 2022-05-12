@@ -12,7 +12,7 @@ block content
         .box
           +Messages(meta.Messages)
           h1 Role
-          a.btn(href='/manage/roles/new') New Role
+          a.btn(href=config.Url('/manage/roles/new')) New Role
 
           ul.nodes-list
             each role in roles
@@ -21,7 +21,9 @@ block content
                   if role.Root
                     span.status.success Root
                   | &nbsp;
-                  a(href=fmt.Sprintf("/manage/roles/%d", role.ID))=role.Name
+                  - var roleEditUrl = fmt.Sprintf("/manage/roles/%d", role.ID)
+                  a(href=config.Url(roleEditUrl))=role.Name
+
       .right
         .box.fixed-sidebar
           +helpManage()

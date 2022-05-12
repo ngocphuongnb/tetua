@@ -4,7 +4,7 @@ include ../partials/common.jade
 block content
   :go:func Profile(user *entities.User, paginate *entities.Paginate[entities.Post], comments []*entities.Comment)
   .container
-    .box.page-desc
+    .box.page-desc.profile
       !=user.AvatarElm('100', '100', false)
       h1(style='text-align:center')=user.Name()
       .user-attrs.flex
