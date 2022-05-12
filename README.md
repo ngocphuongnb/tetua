@@ -17,7 +17,7 @@ Tetua is built on top of awesome libraries like:
 ### Create the config file
 
 ```sh
-- ./tetua init
+./tetua init
 ```
 
 The config file will be created in the current directory.
@@ -49,13 +49,13 @@ You can skip this initialization step by specifying the environment variables:
 
 ### Create the Admin account
 ```sh
-- ./tetua setup -u admin -p password
+./tetua setup -u admin -p password
 ```
 
 ### Run the server
 
 ```sh
-- ./tetua run
+./tetua run
 ```
 
 ## Features
@@ -81,14 +81,14 @@ You can skip this initialization step by specifying the environment variables:
 *Requirements:*
 
 - Go 1.18+
-- - [Goreleaser](https://github.com/goreleaser/goreleaser)
+- [Goreleaser](https://github.com/goreleaser/goreleaser)
 
 The development requires Go 1.18+ as we use `generic`
 
 ### Clone the source code
 
 ```sh
-- git clone https://github.com/ngocphuongnb/tetua.git
+git clone https://github.com/ngocphuongnb/tetua.git
 cd tetua
 go mod tidy
 ```
@@ -120,11 +120,25 @@ make release
 ```
 
 ## Road Map
+* [ ] Pages cache
 * [ ] Sign in with Google
 * [ ] Sign up with email (local account)
 * [ ] Serial posts
 * [ ] Report Abuse
 * [ ] Complete the Unit Test
+
+## Screenshots
+
+![image](https://user-images.githubusercontent.com/3405842/167983805-ff26b8dc-27cb-4aa6-ae84-8ebfefae7dc8.png)
+
+![image](https://user-images.githubusercontent.com/3405842/167983866-32b3444e-591f-47e8-8b0a-d3f0cfd03aa3.png)
+
+![image](https://user-images.githubusercontent.com/3405842/167983936-66624f6b-660b-4ccf-a19f-71d35926c405.png)
+
+![image](https://user-images.githubusercontent.com/3405842/167984104-d08c9b3e-8f87-4041-b04a-ae384a1f46aa.png)
+
+![image](https://user-images.githubusercontent.com/3405842/167984402-295dc7df-8286-4d8a-975e-ae097d9fa9ad.png)
+
 
 ## Contribute
 - If you want to say thank you and/or support the active development of Tetua, please consider some of the following:
