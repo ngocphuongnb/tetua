@@ -1,0 +1,27 @@
+extends ../partials/layout.jade
+include ../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+  script listenDeleteNodeEvents('comment', '/comments', '/comments')
+
+block content
+  :go:func CommentList(paginate *entities.Paginate[entities.Comment])
+  .container
+    .layout.two-left
+      .left
+        .box.fixed-sidebar
+          +userMenu()
+      main.main
+        .box
+          h1 My Comments
+          +Messages(meta.Messages)
+          .comments
+            each comment in paginate.Data
+              +commentView(comment, comment.Post.ID, true, true)
+          - var links = paginate.Links()
+          ul.paginate
+            each link in links
+              li
+                a(href=link.Link class=link.Class)=link.Label
+        

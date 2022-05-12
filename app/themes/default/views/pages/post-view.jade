@@ -1,0 +1,46 @@
+extends ../partials/layout.jade
+include ../partials/common.jade
+
+block footer
+  !=asset.JsFile('editor/highlight-11.5.0.min.js')
+  !=asset.JsFile('js/main.js')
+
+block content
+  :go:func PostView(post *entities.Post, relatedPosts []*entities.Post, comments []*entities.Comment)
+  .container
+    .layout.two-right
+      .main
+        +Messages(meta.Messages)
+        article.box.full.detail
+          if post.FeaturedImage != nil && post.FeaturedImage.ID > 0
+            div.bg
+              img.featured-image(src=post.FeaturedImage.Url() alt=post.Name)
+          .box-content
+            +postMeta(post)
+            h1.post-name=post.Name
+            .tags
+              for topic in post.Topics
+                a(href=topic.Url())='#'+topic.Name
+            !=post.ContentHTML
+            hr
+            h2=fmt.Sprintf("Discussion (%d)", post.CommentCount)
+            
+            .comments
+              .flex
+                !=meta.User.AvatarElm('50', '50', false)
+                    
+                div
+                  form(method="post" action="/comments/new")
+                    input(type="hidden" name="post_id" value=post.ID)
+                    textarea(name="content" placeholder="Write your comment here...")
+                    button(type="submit") Comment
+              each comment in comments
+                - var canEdit = meta.User != nil && comment.UserID == meta.User.ID
+                +commentView(comment, post.ID, canEdit, false)
+                
+      .right
+        .box.fixed-sidebar
+          h2 Trending posts
+          .posts-list
+            each post, pos in relatedPosts
+              +postListItem(post, pos+1)

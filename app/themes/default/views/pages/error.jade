@@ -1,0 +1,12 @@
+extends ../partials/layout.jade
+include ../partials/common.jade
+
+block content
+  :go:func Error(msg string)
+  .container
+    .layout
+      .left
+      .main.text-center
+        h1=msg
+        +Messages(meta.Messages)
+      .right

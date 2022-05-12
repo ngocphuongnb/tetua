@@ -1,0 +1,44 @@
+extends ../partials/layout.jade
+include ../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+  script listenDeleteNodeEvents('post', '/posts', '/posts')
+
+block content
+  :go:func PostList(paginate *entities.Paginate[entities.Post])
+  .container
+    .layout.two-left
+      .left
+        .box.fixed-sidebar
+          +userMenu()
+      main.main
+        .box
+          h1 My Posts
+          +Messages(meta.Messages)
+          .posts-list.manage.nodes-list
+            each post in paginate.Data
+              - var postUrl = post.Url()
+              article
+                .name
+                  if post.Draft
+                    span.status.error Draft
+                    | &nbsp;
+                  if !post.Approved
+                    span.status.error Pending
+                    | &nbsp;
+                  h4(style='display:inline')
+                    a(href=postUrl title=post.Name)=post.Name
+                .tags
+                  for topic in post.Topics
+                    a(href=topic.Url() title=topic.Name)='#'+topic.Name
+                .actions
+                  a.edit-post(href=fmt.Sprintf("/posts/%d", post.ID)) Edit
+                  | &nbsp;&nbsp;
+                  a.delete-post(href='#' data-id=post.ID) Delete
+          - var links = paginate.Links()
+          ul.paginate
+            each link in links
+              li
+                a(href=link.Link class=link.Class)=link.Label
+        

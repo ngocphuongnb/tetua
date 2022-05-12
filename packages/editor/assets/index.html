@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>QR Code Scanner Online - Free scan from camera or image</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,minimum-scale=1,initial-scale=1"
+    />
+    <link rel="canonical" href="https://qr-code-scanner.net" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bamboo.css/dist/light.min.css"
+    />
+    <!-- <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/vs2015.min.css"
+    /> -->
+    <link rel="stylesheet" href="hljs-11.2.0-github.min.css" />
+    <link rel="stylesheet" href="tippy-6.3.7.min.css" />
+    <link rel="stylesheet" href="tippy-light-6.3.7.min.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body style="max-width: 100%">
+    <div class="container">
+      <form method="POST">
+        <textarea class="content" name="content" spellcheck="false">
+# Hello World!
+
+<!-- <div class="iframe-wrapper">
+<iframe src="https://www.youtube.com/embed/iPoWgUktkF0" frameborder="0" allowfullscreen="true" width="500" height="315" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+</div>
+
+<div class="iframe-wrapper">
+<iframe src="https://www.youtube.com/embed/gVKLER0Wx_c" frameborder="0" allowfullscreen="true" width="500" height="315" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+</div> -->
+
+[Support all](https://google.com) frameworks handled by tiptap (Vue 2, Vue 3, React, **see full list**...)
+
+<!-- <div class="iframe-wrapper">
+<iframe src="https://www.youtube.com/embed/XTiTkHB331o" frameborder="0" allowfullscreen="true" width="560" height="315" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+</div> -->
+
+## Heading 2
+
+- [ ] Task 1
+
+- [ ] Task 2
+
+  - [ ] Task 3
+
+  - [ ] Task 4
+
+    - [ ] Task 5
+
+      - [ ] Task 6
+
+That’s a **boring** paragraph *followed* by a ~~fenced~~ `code` block:
+
+![](https://www.w3schools.com/w3css/img_lights.jpg)### **Requirements**
+
+**This package only works with tiptap v2**, tiptap v1 is not supported.
+
+[Support all](https://google.com) frameworks handled by tiptap (Vue 2, Vue 3, React, **see full list**...)
+
+## Reasons why tables are totally rad
+
+Here are a few reasons why tables are super hot right now.
+
+| Reason | Coolness factor | Approved |
+| --- | --- | --- |
+| They've got **columns** | 500 | ✅ |
+| And *rows* | 8000 | ✅ |
+| and different alignment | 20000 | 🔥 |
+
+## **Contributing**
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what [you would like](https://github.com) to change.
+
+Please make sure to update tests as appropriate.
+
+## License
+
+The MIT License (MIT). Please see **License File** for more information.
+
+```vue
+import { Editor } from "@tiptap/vue-3";
+import StarterKit from '@tiptap/starter-kit';
+import { createMarkdownEditor } from "tiptap-markdown";
+
+const MarkdownEditor = createMarkdownEditor(Editor);
+
+export default {
+    mounted() {
+        this.editor = new MarkdownEditor({
+            content: "# Title",
+            extensions: [
+                StarterKit,
+            ],
+        });
+        const markdownOutput = this.editor.getMarkdown();
+    }
+}
+```
+
+## **Keywords**
+
+none
+
+```javascript
+for (var i=1; i <= 20; i++)
+{
+  if (i % 15 == 0)
+    console.log("FizzBuzz");
+  else if (i % 3 == 0)
+    console.log("Fizz");
+  else if (i % 5 == 0)
+    console.log("Buzz");
+  else
+    console.log(i);
+}
+```
+
+Press Command/Ctrl + Enter to leave the fenced code block and continue typing in boring paragraphs.
+
+```php
+<?php
+
+class MyTestClass {
+  public function setting() {}
+}
+
+function getInfo() {
+}
+```
+
+```go
+package main
+
+func main() {
+  fmt.Println("ok")
+}
+```
+      </textarea
+        >
+        <button>Save</button>
+      </form>
+      <button onclick="console.log(editor.tiptapEditor.getHTML())">
+        Get Value
+      </button>
+      <button onclick="console.log(editor.tiptapEditor.getMarkdown())">
+        Get Value
+      </button>
+    </div>
+    <script defer src="highlight-11.5.0.min.js"></script>
+    <script defer src="editor.js"></script>
+    <script>
+      window.onload = () => {
+        window.editor = new TetuaEditor(".content");
+        console.log(window.editor.inititalized);
+      };
+    </script>
+  </body>
+</html>

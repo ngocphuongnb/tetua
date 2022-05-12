@@ -1,0 +1,34 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+  script listenDeleteNodeEvents('file', '/files', '/manage/files')
+
+block content
+  :go:func ManageFileIndex(paginate *entities.Paginate[entities.File])
+  .container
+    .layout.two-left
+      .left
+        .box.fixed-sidebar
+          +userMenu()
+      main.main
+        .box
+          h1 My Files
+          +Messages(meta.Messages)
+          .files-list(style='')
+            each file in paginate.Data
+              - var fileUrl = file.Url()
+              div
+                  a(href=fileUrl target='_blank')
+                    img(src=fileUrl)
+                .actions(style='font-size:.86rem')
+                  div
+                    a(href=file.User.Url() target='_blank')
+                      =file.User.Name()
+                  a.delete-file(href='#' data-id=file.ID) Delete
+          - var links = paginate.Links()
+          ul.paginate
+            each link in links
+              li
+                a(href=link.Link class=link.Class)=link.Label

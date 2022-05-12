@@ -1,0 +1,48 @@
+extends ../partials/layout.jade
+include ../partials/common.jade
+
+block content
+  :go:func Index(topics []*entities.Topic, paginate *entities.Paginate[entities.Post], topPosts []*entities.Post)
+  .container
+    .layout
+      .left
+        if config.SHOW_TETUA_BLOCK
+          .box
+            h2.head Tetua
+            ul.tetua
+              li
+                a(href="https://github.com/ngocphuongnb/tetua")
+                  svg(viewBox='0 0 24 24')
+                    path(fill='currentColor' d='M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z')
+                  | Github
+              li
+                a(href="https://tetua.net/tetua-document")
+                  svg(viewBox='0 0 24 24')
+                    path(fill='currentColor' d='M14,17H7V15H14M17,13H7V11H17M17,9H7V7H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z')
+                  | Document
+              li
+                a(href="https://github.com/ngocphuongnb/tetua/releases")
+                  svg(viewBox='0 0 24 24')
+                    path(fill='currentColor' d='M5.12,5L5.93,4H17.93L18.87,5M12,17.5L6.5,12H10V10H14V12H17.5L12,17.5M20.54,5.23L19.15,3.55C18.88,3.21 18.47,3 18,3H6C5.53,3 5.12,3.21 4.84,3.55L3.46,5.23C3.17,5.57 3,6 3,6.5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V6.5C21,6 20.83,5.57 20.54,5.23Z')
+                  | Releases
+        .box.fixed-sidebar
+          h2.head Topics
+          +topicList(topics)
+      main.main
+        +Messages(meta.Messages)
+        .article-list
+          each post in paginate.Data
+            +postCard(post)
+        - var links = paginate.Links()
+        ul.paginate
+          each link in links
+            li
+              a(href=link.Link class=link.Class)=link.Label
+
+      .right
+        .box.fixed-sidebar
+          h2 Top posts
+          .posts-list
+            each post, pos in topPosts
+              +postListItem(post, pos+1)
+        

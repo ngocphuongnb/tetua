@@ -1,0 +1,11 @@
+{
+	"asset": {
+		"dir": "assets",
+		"disable_inline": [
+			"js/highlight-11.5.0.min.js"
+		],
+		"disable_minify": [
+			"js/highlight-11.5.0.min.js"
+		]
+	}
+}

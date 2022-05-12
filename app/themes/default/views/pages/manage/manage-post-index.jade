@@ -1,0 +1,72 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+  !=asset.JsFile('js/manage.js')
+  script listenDeleteNodeEvents('post', '/posts', function(e,rs){e.target.closest('li').remove()})
+
+block content
+  :go:func ManagePostIndex(data *entities.Paginate[entities.Post], topics []*entities.Topic, topicIDs []int, search, publish, approve string)
+  .container
+    .layout.two-left
+      .left
+        .box.fixed-sidebar
+          +manageMenu()
+      .main
+        .box
+          +Messages(meta.Messages)
+          form.search-form(method='get' action='' accept-charset='UTF-8' style="width: 100%;overflow:initial;")
+            input.search-input(type='text' name='q' placeholder='Search posts...' value=search style="width: auto;flex-grow: 1;")
+            +topicSelectSingle('topic', topics, topicIDs)
+            select(name='publish' style='width:120px')
+              option(value='') With draft
+              if publish == "draft"
+                option(value='draft' selected='') Draft only
+              else
+                option(value='draft') Draft only
+              if publish == "published"
+                option(value='published' selected='') Published
+              else
+                option(value='published') Published
+            select(name='approve' style='width:120px')
+              option(value='') All status
+              if approve == "approved"
+                option(value='approved' selected='') Approved
+              else
+                option(value='approved') Approved
+              if approve == "pending"
+                option(value='pending' selected='') Pending
+              else
+                option(value='pending') Pending
+            button.search-btn(type='submit' aria-label='Search posts')
+              svg(style='width:24px;height:24px' viewBox='0 0 24 24')
+                path(fill='currentColor' d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z')
+
+          h1 Posts
+          ul.nodes-list
+            each post in data.Data
+              li
+                .name
+                  if post.Draft
+                    span.status.error Draft
+                    | &nbsp;
+                  if !post.Approved
+                    span.status.error Pending
+                    | &nbsp;
+                  h4(style='display:inline')
+                    a(href=post.Url() target='_blank')=post.Name
+                  div.date=post.CreatedAt.Format("2006-01-02 15:04:05")
+                .info
+                  div.author=fmt.Sprintf("%s", post.User.Username)
+                  div
+                    a(href=fmt.Sprintf("/posts/%d", post.ID)) Edit
+                    | &nbsp;&nbsp;
+                    a.delete-post(data-id=post.ID href="#") Delete
+                    | &nbsp;&nbsp;
+                    a.approve-post(data-id=post.ID href="#") Approve
+          - var links = data.Links()
+          ul.paginate
+            each link in links
+              li
+                a(href=link.Link class=link.Class)=link.Label

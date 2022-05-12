@@ -1,0 +1,60 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+  script listenDeleteNodeEvents('user', '/manage/users', '/manage/users')
+
+block content
+  :go:func ManageUserCompose(ID int, user *entities.User, roles []*entities.Role, providers []server.AuthProvider)
+  .container
+    form(method='POST' enctype='multipart/form-data')
+      .layout
+        .left
+          .box.fixed-sidebar
+            +manageMenu()
+        .main
+          .box
+            if ID > 0
+              h1="Editing user: " + user.Username
+            else
+              h1="Create a new user"
+            +Messages(meta.Messages)
+            +formInput('username', user.Username, 'Username')
+            +formInput('display_name', user.DisplayName, 'Display name')
+            +formInput('email', user.Email, 'Email')
+            +formInput('url', user.URL, 'Url')
+            +formTextarea('bio', user.Bio, 'User bio')
+
+            p Auth provider
+              select(name='provider')
+                each provider in providers
+                  +formOption(provider.Name(), user.Provider, provider.Name())
+
+            +formInput('provider_id', user.ProviderID, 'Provider ID')
+            +formInput('provider_username', user.ProviderUsername, 'Provider username')
+            +formInput('provider_avatar', user.ProviderAvatar, 'Provider avatar')
+            hr
+            strong To keep the old password, leave this field blank.
+            +formInput('password', user.Password, 'Password')
+        .right
+          .box.fixed-sidebar
+            .flex(style='justify-content: space-between')
+              +newButton('New User', '/manage/users/new')
+              +formSwitch('active', user.Active, 'Active')
+            
+            .save-actions   
+              button Save
+              if ID > 1
+                button.danger.delete-user(data-id=ID type='button') Delete
+            strong Select roles
+            +roleSelectMulti('role_ids', roles, user.RoleIDs)
+            div
+              strong Avatar
+              input.image-input#avatar-image(type='file' name='avatar_image')
+              .image-upload-previewer(for='avatar-image')
+                if user.AvatarImage != nil
+                  img(src=user.AvatarImage.Url())
+                else
+                  img
+            

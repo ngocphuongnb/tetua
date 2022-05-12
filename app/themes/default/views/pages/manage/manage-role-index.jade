@@ -1,0 +1,27 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block content
+  :go:func ManageRoleIndex(roles []*entities.Role)
+  .container
+    .layout
+      .left
+        .box.fixed-sidebar
+          +manageMenu()
+      .main
+        .box
+          +Messages(meta.Messages)
+          h1 Role
+          a.btn(href='/manage/roles/new') New Role
+
+          ul.nodes-list
+            each role in roles
+              li
+                .name
+                  if role.Root
+                    span.status.success Root
+                  | &nbsp;
+                  a(href=fmt.Sprintf("/manage/roles/%d", role.ID))=role.Name
+      .right
+        .box.fixed-sidebar
+          +helpManage()

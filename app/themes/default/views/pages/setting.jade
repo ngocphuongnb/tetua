@@ -1,0 +1,42 @@
+extends ../partials/layout.jade
+include ../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+
+block content
+  :go:func UserSetting(user *entities.User)
+  .container
+    form(method='POST' enctype='multipart/form-data')
+      .layout
+        .left
+          .box.fixed-sidebar
+            +userMenu()
+        .main
+          .box
+            h1="Settings"
+            +Messages(meta.Messages)
+            +formInput('username', user.Username, 'Username')
+            +formInput('display_name', user.DisplayName, 'Display name')
+            +formInput('email', user.Email, 'Email')
+            +formInput('url', user.URL, 'Url')
+            +formTextarea('bio', user.Bio, 'Bio')
+
+            //- strong=user.Provider
+            //- +formInput('provider', user.Provider, 'Provider')
+            //- +formInput('provider_id', user.ProviderID, 'Provider ID')
+            //- +formInput('provider_username', user.ProviderUsername, 'Provider username')
+            //- +formInput('provider_avatar', user.ProviderAvatar, 'Provider avatar')
+            hr
+            strong To keep the old password, leave this field blank.
+            +formInput('password', user.Password, 'Password')
+        .right
+          .box.fixed-sidebar
+            .save-actions   
+              button Save
+            div
+              strong Avatar
+              input.image-input#avatar-image(type='file' name='avatar_image')
+              .image-upload-previewer(for='avatar-image')
+                !=user.AvatarElm('auto', 'auto', true)
+            

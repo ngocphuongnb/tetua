@@ -1,0 +1,35 @@
+extends ../partials/layout.jade
+include ../partials/common.jade
+
+block header
+  link(rel='alternate' type='application/rss+xml' title=topic.Name + ' Feed' href=topic.FeedUrl())
+
+block content
+  :go:func TopicView(topics []*entities.Topic, topic *entities.Topic, paginate *entities.Paginate[entities.Post], topPosts []*entities.Post)
+  .container
+    .box.page-desc
+      h1=topic.Name
+      !=topic.ContentHTML
+    .layout
+      .left
+        .box.fixed-sidebar
+          h2.head Topics
+          +topicList(topics)
+      main.main
+        +Messages(meta.Messages)
+        .article-list
+          each post in paginate.Data
+            +postCard(post)
+        - var links = paginate.Links()
+        ul.paginate
+          each link in links
+            li
+              a(href=link.Link class=link.Class)=link.Label
+
+      .right
+        .box.fixed-sidebar
+          h2 Top posts
+          .posts-list
+            each post, pos in topPosts
+              +postListItem(post, pos+1)
+        

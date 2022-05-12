@@ -1,0 +1,41 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+  script(src='/static/js/manage.js')
+  script listenDeleteNodeEvents('topic', '/manage/roles', '/manage/topics')
+
+block content
+  :go:func ManageTopicCompose(topics []*entities.Topic, topic *entities.TopicMutation)
+  .container
+    form(method='POST')
+      .layout
+        .left
+          .box.fixed-sidebar
+            +manageMenu()
+        .main
+          .box
+            if topic.ID > 0
+              h1="Editing topic: " + topic.Name
+            else
+               h1 Create new topic
+           
+            +Messages(meta.Messages)
+            +formInput('name', topic.Name, 'Name')
+            +formTextarea('content', topic.Content, 'Description')
+        .right
+          .box.fixed-sidebar
+            .flex
+              +newButton('New Topic', '/manage/topics/new')
+            div
+              label Parent topic
+              +topicSelect('parent_id', topics, topic)
+            .save-actions   
+              button Save
+              if topic.ID > 0
+                button.danger.delete-topic(data-id=topic.ID) Delete
+
+            +helpCompose()
+
+

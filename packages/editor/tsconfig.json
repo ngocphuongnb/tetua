@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src/index.ts",
+    "module": "commonjs",
+    "target": "es5",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "sourceMap": false,
+    "declaration": false,
+    "preserveConstEnums": false,
+    "downlevelIteration": true,
+    "removeComments": true,
+    // "outFile": "scanner/index.js",
+    "paths": { "": [ "node_modules/" ] }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/global.d.ts",
+  ],
+  "exclude": [
+    "index.js"
+  ]
+}

@@ -1,0 +1,49 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+  script listenDeleteNodeEvents('role', '/manage/roles', '/manage/roles')
+
+block content
+  :go:func ManageRoleCompose(ID int, role *entities.RoleMutation, permissions []*entities.PermissionValue)
+  .container
+    form(method='POST')
+      .layout
+        .left
+          .box.fixed-sidebar
+            +manageMenu()
+        .main
+          .box
+            if ID > 0
+              h1="Editing role: " + role.Name
+            else
+              h1="Create a new role"
+            +Messages(meta.Messages)
+            +formInput('name', role.Name, 'Role Name')
+            +formInput('description', role.Description, 'Role Description')
+
+            if ID != 1
+              h2 Role Permissions
+              each permission, i in permissions
+                .flex
+                  label(style='width:50%')=strings.Title(strings.Join(strings.Split(permission.Action, "."), " "))
+                  input(type='hidden' name="permissions." + strconv.Itoa(i) + ".Action" value=permission.Action)
+                  select(style='width:50%' name="permissions." + strconv.Itoa(i) + ".Value")
+                    +formOption(entities.PERM_NONE, permission.Value, 'None')
+                    +formOption(entities.PERM_OWN, permission.Value, 'Own')
+                    +formOption(entities.PERM_ALL, permission.Value, 'All')
+        .right
+          .box.fixed-sidebar
+            .flex(style='justify-content: space-between')
+              +newButton('New Role', '/manage/roles/new')
+              +formSwitch('root', role.Root, 'Root')
+              
+            .save-actions   
+              button Save
+              if ID > 3
+                button.danger.delete-role(data-id=ID type='button') Delete
+
+            +helpCompose()
+
+

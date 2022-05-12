@@ -1,0 +1,12 @@
+views/*.go
+app/asset/bundled.js.go
+app/asset/bundled.css.go
+app/asset/bundled.other.go
+public
+private
+config.json
+tetua
+packages/editor/node_modules
+test/*.txt
+test/*.html
+dist/

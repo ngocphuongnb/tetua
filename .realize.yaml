@@ -1,0 +1,41 @@
+settings:
+  legacy:
+    force: false
+    interval: 0s
+schema:
+- name: tetua
+  path: .
+  args:
+    - run
+  env:
+    APP_ENV: development
+  commands:
+    install:
+      status: true
+      method: go build -o private/tmp/tetua.out main.go
+    run:
+      status: true
+      method: private/tmp/tetua.out
+  
+  watcher:
+    extensions:
+    - go
+    - jade
+    - css
+    - js
+    scripts:
+    - type: before
+      command: go run ./packages/prebuild/prebuild.go
+      output: true
+    errorOutputPattern: mypattern   //custom error pattern
+    paths:
+    - /
+    ignore:
+      paths:
+      - .git
+      - .realize
+      - editor
+      - views
+      - private
+      - public/editor
+      - packages/editor

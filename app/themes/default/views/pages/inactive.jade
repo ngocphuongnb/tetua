@@ -1,0 +1,17 @@
+extends ../partials/layout.jade
+
+block content
+  :go:func Inactive()
+  .container
+    .layout
+      .left
+      .main
+        .box.login
+          h1.text-center Inactive
+          +Messages(meta.Messages)
+          p.text-center
+            | Your account is currently inactive.
+            br
+            | Please contact the site administrator: 
+            =config.Setting("contact_email")
+      .right

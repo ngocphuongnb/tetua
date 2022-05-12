@@ -1,0 +1,61 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block footer
+  !=asset.JsFile('js/main.js')
+
+block content
+  :go:func ManageSettings(settings []*config.SettingItem)
+  .container
+    form(method='POST' enctype='multipart/form-data')
+      .layout
+        .left
+          .box.fixed-sidebar
+            +manageMenu()
+        .main
+          .box
+            h1="Settings"
+            +Messages(meta.Messages)
+            each setting, i in settings
+              - var label = strings.Title(strings.Join(strings.Split(setting.Name, "_"), " "))
+              - var settingName = fmt.Sprintf("settings.%d.name", i)
+              - var settingType = fmt.Sprintf("settings.%d.type", i)
+              - var settingValue = fmt.Sprintf("settings.%d.value", i)
+              if setting.Type == "image"
+                div
+                  input(name=settingName value=setting.Name type='hidden')
+                  input(name=settingType value=setting.Type type='hidden')
+                  input(name=settingValue value=setting.Value type='hidden')
+
+                  label(for=setting.Name)=label
+                  input.image-input(type='file' id=setting.Name name=setting.Name)
+                  .image-upload-previewer(for=setting.Name)
+                    img(src=setting.Value)
+              else if setting.Type == "textarea"
+                p
+                  input(name=settingName value=setting.Name type='hidden')
+                  input(name=settingType value=setting.Type type='hidden')
+                  label(for=setting.Name)=label
+                  textarea(id=setting.Name name=settingValue)=setting.Value
+              else if setting.Type == "switch"
+                div
+                  input(name=settingName value=setting.Name type='hidden')
+                  input(name=settingType value=setting.Type type='hidden')
+                  .flex
+                    label.switch(for=setting.Name)
+                      if setting.Value == "yes"
+                        input(id=setting.Name type='checkbox' name=settingValue value='yes' checked='checked')
+                      else
+                        input(id=setting.Name type='checkbox' name=settingValue value='yes')
+                      span.slider
+                    label(for=setting.Name)=label
+              else
+                p
+                  input(name=settingName value=setting.Name type='hidden')
+                  input(name=settingType value=setting.Type type='hidden')
+                  label(for=setting.Name)=label
+                  input(id=setting.Name name=settingValue value=setting.Value)
+        .right
+          .box.fixed-sidebar
+            .save-actions   
+              button Save

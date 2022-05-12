@@ -1,0 +1,49 @@
+extends ../partials/layout.jade
+include ../partials/common.jade
+
+block header
+  //- link(rel='stylesheet' href='/static/editor/hljs-11.2.0-github.min.css')
+  //- link(rel='stylesheet' href='/static/editor/tippy-6.3.7.min.css')
+  //- link(rel='stylesheet' href='/static/editor/tippy-light-6.3.7.min.css')
+  //- link(rel='stylesheet' href='/static/editor/style.css')
+
+  !=asset.CssFile('editor/tippy-6.3.7.min.css')
+  !=asset.CssFile('editor/tippy-light-6.3.7.min.css')
+  !=asset.CssFile('editor/style.css')
+
+block footer
+  !=asset.JsFile('editor/highlight-11.5.0.min.js')
+  !=asset.JsFile('editor/editor.js')
+  !=asset.JsFile('js/main.js')
+  script. new TetuaEditor('.content', {uploadHandler: uploadHandler});
+
+block content
+  :go:func PostCompose(topics []*entities.Topic, post *entities.PostMutation, featuredImage *entities.File)
+  .container
+    form(method='POST' enctype='multipart/form-data')
+      .layout.two-right
+        .main
+          +Messages(meta.Messages)
+          textarea.content(name='content' spellcheck='false')=post.Name + "\n" + post.Content
+        .right
+          .box.fixed-sidebar
+            .save-actions
+              button Save
+              label.switch(for='save-draft')
+                | Draft &nbsp;
+                if post.Draft
+                  input#save-draft(type='checkbox' name='draft' checked='checked')
+                else
+                  input#save-draft(type='checkbox' name='draft')
+                span.slider
+            div
+              strong Post Topics
+              +topicCheckboxMulti('topic_ids', topics, post.TopicIDs)
+            div
+              strong Featured Image
+              input(type='hidden' name='featured_image_id' value=post.FeaturedImageID)
+              input.image-input#featured-image(type='file' name='featured_image')
+              .image-upload-previewer(for='featured-image')
+                img(src=featuredImage.Url())
+            +helpCompose()
+

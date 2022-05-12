@@ -1,0 +1,23 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block content
+  :go:func ManageTopicIndex(topics []*entities.Topic)
+  .container
+    .layout
+      .left
+        .box.fixed-sidebar
+          +manageMenu()
+      .main
+        .box
+          +Messages(meta.Messages)
+          h1 Topic
+          a.btn(href='/manage/topics/new') New Topic
+
+          ul.nodes-list
+            each topic in topics
+              li
+                a(href=fmt.Sprintf("/manage/topics/%d", topic.ID))=topic.Name
+      .right
+        .box.fixed-sidebar
+          +helpManage()

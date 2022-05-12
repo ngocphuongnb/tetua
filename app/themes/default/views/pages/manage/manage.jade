@@ -1,0 +1,19 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+block content
+  :go:func Manage()
+  .container
+    .layout
+      .left
+        .box.fixed-sidebar
+          +manageMenu()
+      .main
+        .box
+          +Messages(meta.Messages)
+          h1 Manage
+
+
+      .right
+        .box.fixed-sidebar
+          +helpManage()
