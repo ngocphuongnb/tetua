@@ -87,9 +87,9 @@ window.addEventListener('load', function () {
     var languages = hljs.listLanguages();
 
     for (var hlNode of Array.from(hlNodes)) {
-      var language =
-        (hlNode.className || "").substring("language-".length) || "auto";
+      var language = (hlNode.className || "").substring("language-".length) || "auto";
       hlNode.setAttribute("data-language", language);
+      hlNode.parentNode.setAttribute("data-language", language);
 
       if (languages.includes(language)) {
         hljs.highlightElement(hlNode, { language });

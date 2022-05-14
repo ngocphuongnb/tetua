@@ -135,13 +135,13 @@ make release
 
 ![image](https://user-images.githubusercontent.com/3405842/167983936-66624f6b-660b-4ccf-a19f-71d35926c405.png)
 
-![image](https://user-images.githubusercontent.com/3405842/167984104-d08c9b3e-8f87-4041-b04a-ae384a1f46aa.png)
-
 ![image](https://user-images.githubusercontent.com/3405842/167984402-295dc7df-8286-4d8a-975e-ae097d9fa9ad.png)
+
+![image](https://user-images.githubusercontent.com/3405842/167984104-d08c9b3e-8f87-4041-b04a-ae384a1f46aa.png)
 
 
 ## Contribute
-- If you want to say thank you and/or support the active development of Tetua, please consider some of the following:
+If you want to say thank you and/or support the active development of Tetua, please consider some of the following:
 
 1. Add a GitHub Star to the project.
 2. Create a pull request.

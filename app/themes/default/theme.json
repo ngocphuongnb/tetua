@@ -2,7 +2,9 @@
 	"asset": {
 		"dir": "assets",
 		"disable_inline": [
-			"js/highlight-11.5.0.min.js"
+			"js/highlight-11.5.0.min.js",
+			"css/light.min.css",
+			"css/style.css"
 		],
 		"disable_minify": [
 			"js/highlight-11.5.0.min.js"

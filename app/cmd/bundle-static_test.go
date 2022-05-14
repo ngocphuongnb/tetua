@@ -3,6 +3,8 @@ package cmd
 import (
 	"io/ioutil"
 	"os"
+	"path"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -42,24 +44,22 @@ func TestBundleAssets(t *testing.T) {
 	bundledJsContent := readFile("../asset/bundled.js.go")
 	bundledOtherContent := readFile("../asset/bundled.other.go")
 
-	if err := os.Chdir("../../"); err != nil {
-		panic(err)
-	}
+	_, testFile, _, _ := runtime.Caller(0)
+	config.ROOT_DIR = path.Join(path.Dir(testFile), "../../")
 
-	themeDir = "app/themes/default"
-	config.ROOT_DIR = "."
-	config.WD = "."
+	themeDir = path.Join(config.ROOT_DIR, "app/themes/default")
+	config.WD = config.ROOT_DIR
 
 	asset.Load(themeDir, true)
 	assert.Equal(t, nil, BundleStaticAssets())
 
-	newBundledCssMTime, _ := fileMTime("app/asset/bundled.css.go")
-	newBundledJsMTime, _ := fileMTime("app/asset/bundled.js.go")
-	newBundledOtherMTime, _ := fileMTime("app/asset/bundled.js.go")
+	newBundledCssMTime, _ := fileMTime(config.ROOT_DIR + "/app/asset/bundled.css.go")
+	newBundledJsMTime, _ := fileMTime(config.ROOT_DIR + "/app/asset/bundled.js.go")
+	newBundledOtherMTime, _ := fileMTime(config.ROOT_DIR + "/app/asset/bundled.js.go")
 
-	newBundledCssContent := readFile("app/asset/bundled.css.go")
-	newBundledJsContent := readFile("app/asset/bundled.js.go")
-	newBundledOtherContent := readFile("app/asset/bundled.other.go")
+	newBundledCssContent := readFile(config.ROOT_DIR + "/app/asset/bundled.css.go")
+	newBundledJsContent := readFile(config.ROOT_DIR + "/app/asset/bundled.js.go")
+	newBundledOtherContent := readFile(config.ROOT_DIR + "/app/asset/bundled.other.go")
 
 	assert.Equal(t, true, bundledCssMTime.Before(newBundledCssMTime))
 	assert.Equal(t, true, bundledJsMTime.Before(newBundledJsMTime))
@@ -71,7 +71,7 @@ func TestBundleAssets(t *testing.T) {
 
 	// Test minify js file error
 	invalidJsFileContent := `alert(;`
-	invalidJsFilePath, err := ioutil.TempFile("private/tmp", "jsfile-")
+	invalidJsFilePath, err := ioutil.TempFile(config.ROOT_DIR+"/private/tmp", "jsfile-")
 
 	if err != nil {
 		panic(err)
@@ -107,9 +107,10 @@ func TestBundleAssets(t *testing.T) {
 }
 
 func TestWriteBundledAssetsError(t *testing.T) {
-	config.ROOT_DIR = "."
-	config.WD = "."
-	themeDir := "app/themes/default"
+	_, testFile, _, _ := runtime.Caller(0)
+	config.ROOT_DIR = path.Join(path.Dir(testFile), "../../")
+	config.WD = config.ROOT_DIR
+	themeDir := config.ROOT_DIR + "/app/themes/default"
 	asset.Load(themeDir, true)
 
 	reset()

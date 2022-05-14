@@ -134,13 +134,9 @@ body.show-menu div.overlay {
 .layout > * {
   padding: var(--layout-gap) 0 0;
 }
-.layout .main {
-  overflow: hidden;
-  min-width: 0;
-}
 
 .layout.two-right {
-  grid-template-columns: 2fr 320px;
+  grid-template-columns: minmax(0, 2fr) 320px;
 }
 .layout.two-left {
   grid-template-columns: 240px 2fr;
@@ -175,22 +171,27 @@ textarea {
   line-height: 1.5;
   background: #f8fafc;
 }
-.scroll {
+.scroll,
+.detail pre code {
   overflow: auto;
 }
-.scroll::-webkit-scrollbar-track {
+.scroll::-webkit-scrollbar-track,
+.detail pre code::-webkit-scrollbar-track {
   border-radius: 10px;
   background-color: transparent;
 }
-.scroll::-webkit-scrollbar-thumb {
+.scroll::-webkit-scrollbar-thumb,
+.detail pre code::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: #ccc;
 }
-.scroll::-webkit-scrollbar-corner {
+.scroll::-webkit-scrollbar-corner,
+.detail pre code::-webkit-scrollbar-corner {
   background-color: transparent;
   border-color: transparent;
 }
-.scroll::-webkit-scrollbar {
+.scroll::-webkit-scrollbar,
+.detail pre code::-webkit-scrollbar {
   width: 10px;
   height: 10px;
   background-color: transparent;
@@ -654,7 +655,10 @@ ul.messages .error {
 
 .detail pre {
   background: #f6f8fa;
-overflow: auto;max-width: 100%;white-space: pre-wrap;}
+  overflow: hidden;
+  max-width: 100%;
+  position: relative;
+}
 .detail > *:last-child {
   margin-bottom: 0;
 }
@@ -662,9 +666,9 @@ overflow: auto;max-width: 100%;white-space: pre-wrap;}
   display: block;
   position: relative;
   background: transparent;
-  padding: .25rem 0;
+  padding: 0.5rem 0;
 }
-.detail pre code[data-language]:before {
+.detail pre[data-language]:before {
   content: attr(data-language);
   position: absolute;
   right: 0;
@@ -672,10 +676,10 @@ overflow: auto;max-width: 100%;white-space: pre-wrap;}
   display: inline-block;
   border-radius: 0.25rem;
   background: var(--b-bg-2);
-  padding: 4px 10px 5px;
+  padding: 3px 6px 5px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.125;
   color: var(--b-txt);
 }

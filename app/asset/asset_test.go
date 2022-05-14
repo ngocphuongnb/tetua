@@ -52,15 +52,15 @@ func TestCssFileLink(t *testing.T) {
 	assert.Equal(t, "<link rel=\"stylesheet\" href=\"/assets/css/style.css\" />", CssFile("css/style.css"))
 }
 
-func TestCssFileInline(t *testing.T) {
-	checkBundledAssets()
-	themeDir := "../themes/default"
-	config.DEVELOPMENT = false
-	assetName := "css/style.css"
-	Load(themeDir, true)
-	styleFile := getStaticFile(assetName, "css")
-	assert.Equal(t, fmt.Sprintf(`<style type="text/css" data-file="%s">%s</style>`, assetName, styleFile.Content), CssFile(assetName))
-}
+// func TestCssFileInline(t *testing.T) {
+// 	checkBundledAssets()
+// 	themeDir := "../themes/default"
+// 	config.DEVELOPMENT = false
+// 	assetName := "css/style.css"
+// 	Load(themeDir, true)
+// 	styleFile := getStaticFile(assetName, "css")
+// 	assert.Equal(t, fmt.Sprintf(`<style type="text/css" data-file="%s">%s</style>`, assetName, styleFile.Content), CssFile(assetName))
+// }
 
 func TestJsFileLink(t *testing.T) {
 	checkBundledAssets()
