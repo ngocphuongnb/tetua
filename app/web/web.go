@@ -137,6 +137,18 @@ func NewServer(cfg Config) server.Server {
 			if assetFile.DisableInline {
 				func(assetPath string, assetFile *asset.StaticAsset) {
 					s.Get(assetPath, func(c server.Context) error {
+						contentType := "text/plain; charset=utf-8"
+
+						if assetFile.Type == "css" {
+							contentType = "text/css; charset=utf-8"
+						}
+
+						if assetFile.Type == "js" {
+							contentType = "text/javascript; charset=utf-8"
+						}
+
+						c.Header("Content-Type", contentType)
+
 						return c.SendString(assetFile.Content)
 					})
 				}(assetPath, assetFile)

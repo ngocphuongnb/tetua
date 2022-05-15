@@ -34,6 +34,11 @@ func Save(c server.Context) (err error) {
 		return c.Render(views.UserSetting(user))
 	}
 
+	if data.Username == "" || data.Email == "" {
+		c.Messages().AppendError("Username and email are required")
+		return c.Render(views.UserSetting(user))
+	}
+
 	existedUsers, err := repositories.User.ByUsernameOrEmail(c.Context(), data.Username, data.Email)
 
 	if err == nil && len(existedUsers) > 0 {
