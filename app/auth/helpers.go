@@ -96,10 +96,14 @@ func GetComment(c server.Context) error {
 }
 
 func FileOwnerCheck(c server.Context) bool {
+	if c.Param("id") == "new" {
+		return true
+	}
+
 	user := c.User()
 	file, ok := c.Locals("file").(*entities.File)
 
-	if user == nil {
+	if user == nil || file == nil {
 		return false
 	}
 
@@ -115,6 +119,10 @@ func FileOwnerCheck(c server.Context) bool {
 }
 
 func PostOwnerCheck(c server.Context) bool {
+	if c.Param("id") == "new" {
+		return true
+	}
+
 	user := c.User()
 	post := c.Post()
 
@@ -131,10 +139,14 @@ func PostOwnerCheck(c server.Context) bool {
 }
 
 func CommentOwnerCheck(c server.Context) bool {
+	if c.Param("id") == "new" {
+		return true
+	}
+
 	user := c.User()
 	comment, ok := c.Locals("comment").(*entities.Comment)
 
-	if user == nil {
+	if user == nil || comment == nil {
 		return false
 	}
 

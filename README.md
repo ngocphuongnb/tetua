@@ -102,7 +102,7 @@ make build_editor
 ### Run the test
 
 ```sh
-make test_alll
+make test_all
 ```
 
 ### Build the local release for testing
