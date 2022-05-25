@@ -16,11 +16,11 @@ import (
 // Entities are used in all other parts. This will store properties of business objects and associated methods. Example: Article, User
 
 type Entity interface {
-	Comment | File | Permission | Post | Role | Setting | Topic | User
+	Comment | File | Permission | Post | Page | Role | Setting | Topic | User
 }
 
 type EntityFilter interface {
-	PostFilter | FileFilter | CommentFilter | UserFilter | PermissionFilter | RoleFilter | TopicFilter
+	PostFilter | PageFilter | FileFilter | CommentFilter | UserFilter | PermissionFilter | RoleFilter | TopicFilter
 }
 
 type NotFoundError struct {
@@ -82,17 +82,10 @@ func (ms *Messages) AppendError(m string) {
 }
 
 func (ms *Messages) Length() int {
-	// if ms == nil {
-	// 	return 0
-	// }
 	return len(*ms)
 }
 
 func (ms *Messages) HasError() bool {
-	// if ms == nil {
-	// 	return false
-	// }
-
 	errorCount := 0
 
 	for _, m := range *ms {
@@ -124,7 +117,7 @@ type Filter struct {
 
 func (p *Filter) FilterBaseUrl() string {
 	if p.BaseUrl == "" {
-		return config.Url("")
+		return utils.Url("")
 	}
 
 	return p.BaseUrl

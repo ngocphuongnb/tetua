@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ngocphuongnb/tetua/app/utils"
+	"github.com/ngocphuongnb/tetua/app/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,6 +27,12 @@ const sampleConfigContent = `{
   "storage": {
     "default_disk": "local_public_test",
     "disks": [
+      {
+        "name": "local_public_test",
+        "driver": "local",
+        "root": "./public/storage",
+        "base_url": "http://localhost:3001"
+      },
       {
         "name": "local_public_test",
         "driver": "local",
@@ -54,7 +60,7 @@ const sampleConfigContent = `{
 }`
 
 func createCustomWorkingDir(configContent string) string {
-	workingDir := utils.CreateTestDir("app-")
+	workingDir := test.CreateDir("app-")
 	configFile := path.Join(workingDir, "config.json")
 
 	if err := ioutil.WriteFile(configFile, []byte(configContent), 0644); err != nil {
@@ -68,7 +74,7 @@ func TestConfigInitEmptyAppKey(t *testing.T) {
 	workingDir := createCustomWorkingDir(strings.ReplaceAll(sampleConfigContent, "app_key_test", ""))
 	APP_KEY = ""
 	os.Setenv("APP_KEY ", "")
-	defer utils.RecoverTestPanic(t, "APP_KEY is not set, please set it in config.json or setting the environment variable.\n")
+	defer test.RecoverPanic(t, "APP_KEY is not set, please set it in config.json or setting the environment variable.\n")
 	defer os.RemoveAll(workingDir)
 
 	Init(workingDir)
@@ -78,7 +84,7 @@ func TestConfigInitEmptyDBDsn(t *testing.T) {
 	workingDir := createCustomWorkingDir(strings.ReplaceAll(sampleConfigContent, "root:123@tcp(127.0.0.1:3306)/tetua", ""))
 	DB_DSN = ""
 	os.Setenv("DB_DSN ", "")
-	defer utils.RecoverTestPanic(t, "DB_DSN is not set, please set it in config.json or setting the environment variable.\n")
+	defer test.RecoverPanic(t, "DB_DSN is not set, please set it in config.json or setting the environment variable.\n")
 	defer os.RemoveAll(workingDir)
 
 	Init(workingDir)
@@ -97,7 +103,7 @@ func TestConfigInit(t *testing.T) {
 }
 
 func TestParseConfigFileFailed(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "unexpected end of JSON input")
+	defer test.RecoverPanic(t, "unexpected end of JSON input")
 	WD = createCustomWorkingDir("")
 	defer os.RemoveAll(WD)
 	parseConfigFile()
@@ -114,8 +120,6 @@ func TestParseConfigFile(t *testing.T) {
 	assert.Equal(t, "app_key_test", APP_KEY)
 	assert.Equal(t, "app_token_key_test", APP_TOKEN_KEY)
 	assert.Equal(t, "test_theme", APP_THEME)
-	assert.Equal(t, "github_client_id_test", GITHUB_CLIENT_ID)
-	assert.Equal(t, "github_client_secret_test", GITHUB_CLIENT_SECRET)
 	assert.Equal(t, "test_uuid", COOKIE_UUID)
 	assert.Equal(t, true, SHOW_TETUA_BLOCK)
 	assert.Equal(t, true, DB_QUERY_LOGGING)
@@ -133,8 +137,6 @@ func TestParseEnv(t *testing.T) {
 	os.Setenv("APP_KEY", "env_app_key_test")
 	os.Setenv("APP_TOKEN_KEY", "env_app_token_key_test")
 	os.Setenv("APP_THEME", "env_test_theme")
-	os.Setenv("GITHUB_CLIENT_ID", "env_github_client_id_test")
-	os.Setenv("GITHUB_CLIENT_SECRET", "env_github_client_secret_test")
 	os.Setenv("COOKIE_UUID", "env_test_uuid")
 	os.Setenv("SHOW_TETUA_BLOCK", "true")
 	os.Setenv("DB_QUERY_LOGGING", "true")
@@ -148,8 +150,6 @@ func TestParseEnv(t *testing.T) {
 	assert.Equal(t, "env_app_token_key_test", APP_TOKEN_KEY)
 	assert.Equal(t, "env_app_token_key_test", APP_TOKEN_KEY)
 	assert.Equal(t, "env_test_theme", APP_THEME)
-	assert.Equal(t, "env_github_client_id_test", GITHUB_CLIENT_ID)
-	assert.Equal(t, "env_github_client_secret_test", GITHUB_CLIENT_SECRET)
 	assert.Equal(t, "env_test_uuid", COOKIE_UUID)
 	assert.Equal(t, true, SHOW_TETUA_BLOCK)
 	assert.Equal(t, true, DB_QUERY_LOGGING)
@@ -165,14 +165,14 @@ func TestParseEnv(t *testing.T) {
 
 func TestUrl(t *testing.T) {
 	Settings([]*SettingItem{{Name: "app_base_url", Value: "http://localhost:3002"}})
-	assert.Equal(t, "http://localhost:3002/", Url(""))
-	assert.Equal(t, "http://localhost:3002/posts", Url("/posts"))
+	assert.Equal(t, "http://localhost:3002", Setting("app_base_url"))
 }
 
 func TestCreateConfigFile(t *testing.T) {
-	WD = utils.CreateTestDir("app-")
+	WD = test.CreateDir("app-")
 	defer os.RemoveAll(WD)
-	CreateConfigFile(WD)
+	assert.Equal(t, nil, CreateConfigFile(WD))
+	assert.Equal(t, nil, CreateConfigFile(WD))
 	parseConfigFile()
 
 	assert.Equal(t, "production", APP_ENV)

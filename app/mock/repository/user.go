@@ -15,7 +15,13 @@ type UserRepository struct {
 	*Repository[entities.User]
 }
 
+var ErrorCreateIfNotExistsByProvider = false
+
 func (m *UserRepository) CreateIfNotExistsByProvider(ctx context.Context, userData *entities.User) (*entities.User, error) {
+	if ErrorCreateIfNotExistsByProvider || ctx.Value("CreateIfNotExistsByProvider") != nil {
+		return nil, errors.New("CreateIfNotExistsByProvider error")
+	}
+
 	for _, user := range m.entities {
 		if user.Provider == userData.Provider && user.ProviderID == userData.ProviderID {
 			return user, nil

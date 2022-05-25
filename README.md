@@ -28,24 +28,20 @@ The config file will be created in the current directory.
  "app_key": "{APP_KEY}",
  "app_port": "3000",
  "db_dsn": "",
- "github_client_id": "",
- "github_client_secret": "",
  "db_query_logging": false
 }
 ```
+
+*Look at the `config.example.json` for more configuration options.*
 
 These fields are required:
 
 - `app_key`: the key to encrypt the data
 - `db_dsn`: the database connection string
-- `github_client_id`: the client id for github
-- `github_client_secret`: the client secret for github
 
 You can skip this initialization step by specifying the environment variables:
 - `APP_KEY`
 - `DB_DSN`
-- `GITHUB_CLIENT_ID`
-- `GITHUB_CLIENT_SECRET`
 
 ### Create the Admin account
 ```sh
@@ -61,6 +57,7 @@ You can skip this initialization step by specifying the environment variables:
 ## Features
 
 * Posts Management
+* Page Management
 * Topics Management
 * Users Management
 * Role and Permission Management
@@ -72,6 +69,8 @@ You can skip this initialization step by specifying the environment variables:
 * Local file upload
 * S3 file upload
 * Sign in with Github
+* Sign in with Google
+* Sign in with Twiter
 
 ## Documentation
 - Documentation is hosted live at [https://tetua.net](https://tetua.net)
@@ -121,8 +120,9 @@ make release
 
 ## Road Map
 * [ ] Pages cache
-* [ ] Sign in with Google
-* [ ] Sign up with email (local account)
+* [x] Sign in with Google
+* [x] Sign in with Twitter
+* [x] Sign up with email (local account)
 * [ ] Serial posts
 * [ ] Report Abuse
 * [ ] Complete the Unit Test
@@ -141,7 +141,7 @@ make release
 
 
 ## Contribute
-If you want to say thank you and/or support the active development of Tetua, please consider some of the following:
+If you want to say thanks and/or support the active development of Tetua, please consider some of the following:
 
 1. Add a GitHub Star to the project.
 2. Create a pull request.
@@ -152,24 +152,25 @@ Copyright (c) 2022-present @ngocphuongnb and Contributors. Tetua is free and ope
 
 **Third-party libraries:**
 
-- entgo.io/ent
-- github.com/Joker/hpp
-- github.com/Joker/jade
-- github.com/go-sql-driver/mysql
-- github.com/gofiber/fiber/v2
-- github.com/golang-jwt/jwt/v4
-- github.com/google/uuid
-- github.com/microcosm-cc/bluemonday
-- github.com/valyala/fasthttp
-- go.uber.org/zap
-- github.com/davecgh/go-spew
-- github.com/rclone/rclone
-- github.com/urfave/cli/v2
-- ariga.io/sqlcomment
-- github.com/PuerkitoBio/goquery
-- github.com/gofiber/utils
-- github.com/gorilla/feeds
-- github.com/tdewolff/minify/v2
-- github.com/gosimple/slug
-- github.com/stretchr/testify
-- github.com/yuin/goldmark
+- entgo.io/ent v0.10.1
+- github.com/Joker/hpp v1.0.0
+- github.com/Joker/jade v1.1.3
+- github.com/go-sql-driver/mysql v1.6.0
+- github.com/gofiber/fiber/v2 v2.30.0
+- github.com/golang-jwt/jwt/v4 v4.4.0
+- github.com/google/uuid v1.3.0
+- github.com/microcosm-cc/bluemonday v1.0.18
+- github.com/valyala/fasthttp v1.34.0
+- go.uber.org/zap v1.21.0
+- github.com/davecgh/go-spew v1.1.1
+- github.com/rclone/rclone v1.58.0
+- github.com/urfave/cli/v2 v2.4.0
+- ariga.io/sqlcomment v0.0.0-20211020114721-6bb67a62a61a
+- github.com/PuerkitoBio/goquery v1.8.0
+- github.com/dghubble/oauth1 v0.7.1
+- github.com/gofiber/utils v0.1.2
+- github.com/gorilla/feeds v1.1.1
+- github.com/tdewolff/minify/v2 v2.11.1
+- github.com/gosimple/slug v1.12.0
+- github.com/stretchr/testify v1.7.1
+- github.com/yuin/goldmark v1.4.11

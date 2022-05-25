@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/utils"
 	"github.com/ngocphuongnb/tetua/app/logger"
 	"github.com/ngocphuongnb/tetua/app/server"
 )
@@ -17,6 +18,7 @@ type Server struct {
 type Config struct {
 	JwtSigningKey string
 	AppName       string
+	JSONEncoder   utils.JSONMarshal
 }
 
 func New(config Config) server.Server {
@@ -26,6 +28,7 @@ func New(config Config) server.Server {
 		CaseSensitive:         true,
 		EnablePrintRoutes:     false,
 		DisableStartupMessage: false,
+		JSONEncoder:           config.JSONEncoder,
 		// Prefork:       true,
 		// Immutable:     true,
 	})

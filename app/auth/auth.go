@@ -6,6 +6,7 @@ import (
 
 	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/entities"
+	"github.com/ngocphuongnb/tetua/app/repositories"
 	"github.com/ngocphuongnb/tetua/app/server"
 )
 
@@ -96,7 +97,14 @@ func Routes(s server.Server) {
 
 	authRoute.Get("/callback", func(c server.Context) error {
 		provider := GetProvider(c.Param("provider"))
-		user, err := provider.Callback(c)
+		userData, err := provider.Callback(c)
+
+		if err != nil {
+			c.Logger().Error(err)
+			return c.Status(http.StatusBadGateway).SendString("Something went wrong")
+		}
+
+		user, err := repositories.User.CreateIfNotExistsByProvider(c.Context(), userData)
 
 		if err != nil {
 			c.Logger().Error(err)

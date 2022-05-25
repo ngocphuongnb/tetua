@@ -2,6 +2,7 @@ package webpost
 
 import (
 	"strings"
+	"time"
 
 	"github.com/gosimple/slug"
 	"github.com/ngocphuongnb/tetua/app/config"
@@ -54,8 +55,10 @@ func Save(c server.Context) (err error) {
 		user := c.User()
 
 		if post := c.Post(); post != nil {
+			now := time.Now()
 			savePostData.ID = post.ID
 			savePostData.Approved = post.Approved
+			savePostData.UpdatedAt = &now
 			savedPost, err = repositories.Post.Update(c.Context(), savePostData)
 		} else {
 			savePostData.UserID = user.ID

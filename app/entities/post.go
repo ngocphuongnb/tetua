@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/utils"
 )
 
@@ -55,7 +54,7 @@ type PostFilter struct {
 }
 
 func (p *Post) Url() string {
-	return config.Url(fmt.Sprintf("%s-%d.html", p.Slug, p.ID))
+	return utils.Url(fmt.Sprintf("%s-%d.html", p.Slug, p.ID))
 }
 
 func (p *PostFilter) Base() string {

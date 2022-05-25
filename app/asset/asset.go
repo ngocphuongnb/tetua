@@ -172,7 +172,7 @@ func CssFile(assetName string) string {
 
 	return fmt.Sprintf(
 		`<link rel="stylesheet" href="%s" />`,
-		config.Url(path.Join("/assets", assetName)),
+		utils.Url(path.Join("/assets", assetName)),
 	)
 }
 
@@ -185,10 +185,10 @@ func JsFile(assetName string) string {
 
 	return fmt.Sprintf(
 		`<script charset="utf-8" src="%s"></script>`,
-		config.Url(path.Join("/assets", assetName)),
+		utils.Url(path.Join("/assets", assetName)),
 	)
 }
 
 func OtherFile(assetName string) string {
-	return config.Url(path.Join("/assets", assetName))
+	return utils.Url(path.Join("/assets", assetName))
 }

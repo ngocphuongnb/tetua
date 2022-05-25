@@ -12,6 +12,9 @@ type Comment func(*sql.Selector)
 // File is the predicate function for file builders.
 type File func(*sql.Selector)
 
+// Page is the predicate function for page builders.
+type Page func(*sql.Selector)
+
 // Permission is the predicate function for permission builders.
 type Permission func(*sql.Selector)
 

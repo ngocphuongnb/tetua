@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/entities"
 	"github.com/ngocphuongnb/tetua/app/fs"
 	"github.com/ngocphuongnb/tetua/app/repositories"
@@ -17,7 +16,7 @@ func FileList(c server.Context) error {
 	paginate, err := repositories.File.Paginate(c.Context(), &entities.FileFilter{
 		UserIDs: []int{c.User().ID},
 		Filter: &entities.Filter{
-			BaseUrl:         config.Url("/files"),
+			BaseUrl:         utils.Url("/files"),
 			Page:            c.QueryInt("page"),
 			Limit:           12,
 			IgnoreUrlParams: []string{"user"},

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/file"
+	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/page"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/post"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/user"
 )
@@ -122,6 +123,21 @@ func (fc *FileCreate) AddPosts(p ...*Post) *FileCreate {
 		ids[i] = p[i].ID
 	}
 	return fc.AddPostIDs(ids...)
+}
+
+// AddPageIDs adds the "pages" edge to the Page entity by IDs.
+func (fc *FileCreate) AddPageIDs(ids ...int) *FileCreate {
+	fc.mutation.AddPageIDs(ids...)
+	return fc
+}
+
+// AddPages adds the "pages" edges to the Page entity.
+func (fc *FileCreate) AddPages(p ...*Page) *FileCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fc.AddPageIDs(ids...)
 }
 
 // AddUserAvatarIDs adds the "user_avatars" edge to the User entity by IDs.
@@ -355,6 +371,25 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := fc.mutation.PagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   file.PagesTable,
+			Columns: []string{file.PagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: page.FieldID,
 				},
 			},
 		}

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/comment"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/file"
+	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/page"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/permission"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/post"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/role"
@@ -38,6 +39,7 @@ func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		comment.Table:    comment.ValidColumn,
 		file.Table:       file.ValidColumn,
+		page.Table:       page.ValidColumn,
 		permission.Table: permission.ValidColumn,
 		post.Table:       post.ValidColumn,
 		role.Table:       role.ValidColumn,

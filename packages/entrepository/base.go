@@ -11,7 +11,7 @@ import (
 )
 
 type EntityType interface {
-	ent.Comment | ent.File | ent.Permission | ent.Post | ent.Role | ent.Setting | ent.Topic | ent.User
+	ent.Comment | ent.File | ent.Permission | ent.Post | ent.Page | ent.Role | ent.Setting | ent.Topic | ent.User
 }
 
 type QueryFilter interface {
@@ -25,7 +25,7 @@ type QueryFilter interface {
 }
 
 type EntityQuery[EE EntityType] interface {
-	*ent.CommentQuery | *ent.FileQuery | *ent.PermissionQuery | *ent.PostQuery | *ent.RoleQuery | *ent.SettingQuery | *ent.TopicQuery | *ent.UserQuery
+	*ent.CommentQuery | *ent.FileQuery | *ent.PermissionQuery | *ent.PostQuery | *ent.PageQuery | *ent.RoleQuery | *ent.SettingQuery | *ent.TopicQuery | *ent.UserQuery
 	Count(context.Context) (int, error)
 	All(context.Context) ([]*EE, error)
 }

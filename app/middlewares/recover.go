@@ -20,8 +20,8 @@ func Recover(c server.Context) error {
 			length := runtime.Stack(stack, true)
 			msg := fmt.Sprintf("%v %s\n", err, stack[:length])
 			c.Logger().Error(msg, logger.Context{"recovered": true})
-			if err := c.Status(http.StatusBadRequest).Json(logger.Context{"error": err.Error()}); err != nil {
-				fmt.Println(err)
+			if err := c.Status(http.StatusBadRequest).Json(map[string]string{"error": err.Error()}); err != nil {
+				c.Logger().Error(err)
 			}
 		}
 	}()

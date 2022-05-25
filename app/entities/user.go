@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/ngocphuongnb/tetua/app/config"
+	"github.com/ngocphuongnb/tetua/app/utils"
 )
 
 // User is the model entity for the User schema.
@@ -138,7 +139,7 @@ func (u *User) Url() string {
 	if u == nil {
 		return ""
 	}
-	return config.Url("/u/" + u.Username)
+	return utils.Url("/u/" + u.Username)
 }
 
 func (u *User) Avatar() string {

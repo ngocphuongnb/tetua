@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/file"
+	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/page"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/post"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/predicate"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/user"
@@ -127,6 +128,21 @@ func (fu *FileUpdate) AddPosts(p ...*Post) *FileUpdate {
 	return fu.AddPostIDs(ids...)
 }
 
+// AddPageIDs adds the "pages" edge to the Page entity by IDs.
+func (fu *FileUpdate) AddPageIDs(ids ...int) *FileUpdate {
+	fu.mutation.AddPageIDs(ids...)
+	return fu
+}
+
+// AddPages adds the "pages" edges to the Page entity.
+func (fu *FileUpdate) AddPages(p ...*Page) *FileUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fu.AddPageIDs(ids...)
+}
+
 // AddUserAvatarIDs adds the "user_avatars" edge to the User entity by IDs.
 func (fu *FileUpdate) AddUserAvatarIDs(ids ...int) *FileUpdate {
 	fu.mutation.AddUserAvatarIDs(ids...)
@@ -172,6 +188,27 @@ func (fu *FileUpdate) RemovePosts(p ...*Post) *FileUpdate {
 		ids[i] = p[i].ID
 	}
 	return fu.RemovePostIDs(ids...)
+}
+
+// ClearPages clears all "pages" edges to the Page entity.
+func (fu *FileUpdate) ClearPages() *FileUpdate {
+	fu.mutation.ClearPages()
+	return fu
+}
+
+// RemovePageIDs removes the "pages" edge to Page entities by IDs.
+func (fu *FileUpdate) RemovePageIDs(ids ...int) *FileUpdate {
+	fu.mutation.RemovePageIDs(ids...)
+	return fu
+}
+
+// RemovePages removes "pages" edges to Page entities.
+func (fu *FileUpdate) RemovePages(p ...*Page) *FileUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fu.RemovePageIDs(ids...)
 }
 
 // ClearUserAvatars clears all "user_avatars" edges to the User entity.
@@ -420,6 +457,60 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if fu.mutation.PagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   file.PagesTable,
+			Columns: []string{file.PagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: page.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.RemovedPagesIDs(); len(nodes) > 0 && !fu.mutation.PagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   file.PagesTable,
+			Columns: []string{file.PagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: page.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.PagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   file.PagesTable,
+			Columns: []string{file.PagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: page.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if fu.mutation.UserAvatarsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -590,6 +681,21 @@ func (fuo *FileUpdateOne) AddPosts(p ...*Post) *FileUpdateOne {
 	return fuo.AddPostIDs(ids...)
 }
 
+// AddPageIDs adds the "pages" edge to the Page entity by IDs.
+func (fuo *FileUpdateOne) AddPageIDs(ids ...int) *FileUpdateOne {
+	fuo.mutation.AddPageIDs(ids...)
+	return fuo
+}
+
+// AddPages adds the "pages" edges to the Page entity.
+func (fuo *FileUpdateOne) AddPages(p ...*Page) *FileUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fuo.AddPageIDs(ids...)
+}
+
 // AddUserAvatarIDs adds the "user_avatars" edge to the User entity by IDs.
 func (fuo *FileUpdateOne) AddUserAvatarIDs(ids ...int) *FileUpdateOne {
 	fuo.mutation.AddUserAvatarIDs(ids...)
@@ -635,6 +741,27 @@ func (fuo *FileUpdateOne) RemovePosts(p ...*Post) *FileUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return fuo.RemovePostIDs(ids...)
+}
+
+// ClearPages clears all "pages" edges to the Page entity.
+func (fuo *FileUpdateOne) ClearPages() *FileUpdateOne {
+	fuo.mutation.ClearPages()
+	return fuo
+}
+
+// RemovePageIDs removes the "pages" edge to Page entities by IDs.
+func (fuo *FileUpdateOne) RemovePageIDs(ids ...int) *FileUpdateOne {
+	fuo.mutation.RemovePageIDs(ids...)
+	return fuo
+}
+
+// RemovePages removes "pages" edges to Page entities.
+func (fuo *FileUpdateOne) RemovePages(p ...*Page) *FileUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fuo.RemovePageIDs(ids...)
 }
 
 // ClearUserAvatars clears all "user_avatars" edges to the User entity.
@@ -899,6 +1026,60 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if fuo.mutation.PagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   file.PagesTable,
+			Columns: []string{file.PagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: page.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.RemovedPagesIDs(); len(nodes) > 0 && !fuo.mutation.PagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   file.PagesTable,
+			Columns: []string{file.PagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: page.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.PagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   file.PagesTable,
+			Columns: []string{file.PagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: page.FieldID,
 				},
 			},
 		}

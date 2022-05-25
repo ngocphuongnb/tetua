@@ -55,7 +55,7 @@ export class TetuaEditor {
     this.editorContentElement = document.createElement('div');
     this.editorContentElement.className = 'mely-editor-content';
     this.editorContentElement.appendChild(this.textareaElement);
-    this.editorContentElement.setAttribute('spellcheck', 'false');
+    // this.editorContentElement.setAttribute('spellcheck', 'false');
     this.editorElement.appendChild(this.editorContentElement);
 
 

@@ -15,30 +15,52 @@ import (
 	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/entities"
 	"github.com/ngocphuongnb/tetua/app/mock"
+	mockrepository "github.com/ngocphuongnb/tetua/app/mock/repository"
 	"github.com/ngocphuongnb/tetua/app/repositories"
 	"github.com/ngocphuongnb/tetua/app/server"
-	"github.com/ngocphuongnb/tetua/app/utils"
+	"github.com/ngocphuongnb/tetua/app/test"
 	ga "github.com/ngocphuongnb/tetua/packages/auth"
 	"github.com/ngocphuongnb/tetua/packages/fiberserver"
 	fiber "github.com/ngocphuongnb/tetua/packages/fiberserver"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/oauth2"
 )
 
 func init() {
 	mock.CreateRepositories()
+	repositories.User.Create(context.Background(), mock.RootUser)
 	cache.Roles = []*entities.Role{auth.ROLE_ADMIN, auth.ROLE_USER, auth.ROLE_GUEST}
 }
 
 func TestProvider(t *testing.T) {
-	providers := []server.AuthProvider{
-		ga.NewLocal(),
-		ga.NewMock(&oauth2.Config{}),
-		ga.NewMock(&oauth2.Config{}),
+	providers := map[string]auth.NewProviderFn{
+		"local": ga.NewLocal,
+		"mock1": mock.NewAuth,
+		"mock2": mock.NewAuth,
 	}
-	auth.New(providers...)
-	assert.Equal(t, providers[:2], auth.Providers())
-	assert.Equal(t, providers[1], auth.GetProvider("mock"))
+	providerMap := map[string]map[string]string{
+		"local": nil,
+		"mock1": nil,
+		"mock2": nil,
+	}
+
+	config.Auth = nil
+	auth.New(providers)
+	assert.Equal(t, 0, len(auth.Providers()))
+
+	config.Auth = &config.AuthConfig{
+		EnabledProviders: []string{"local"},
+		Providers:        providerMap,
+	}
+	auth.New(providers)
+	assert.Equal(t, 1, len(auth.Providers()))
+
+	config.Auth = &config.AuthConfig{
+		EnabledProviders: []string{"local", "mock1", "mock2"},
+		Providers:        providerMap,
+	}
+	auth.New(providers)
+	assert.Equal(t, 2, len(auth.Providers()))
+	assert.Equal(t, providers["mock1"](nil).Name(), auth.GetProvider("mock").Name())
 	assert.Equal(t, nil, auth.GetProvider("invalid_provider"))
 }
 
@@ -52,7 +74,7 @@ func TestActionConfigs(t *testing.T) {
 	assert.Equal(t, testConfig, auth.GetAuthConfig("test"))
 	assert.Equal(t, (*server.AuthConfig)(nil), auth.GetAuthConfig("test2"))
 
-	defer utils.RecoverTestPanic(t, "Duplicate action config: test", "duplicate action")
+	defer test.RecoverPanic(t, "Duplicate action config: test", "duplicate action")
 	auth.Config(&server.AuthConfig{
 		Action:       "test",
 		Value:        entities.PERM_ALL,
@@ -100,6 +122,10 @@ func TestHelpers(t *testing.T) {
 	s.Get("/files/:id", func(c server.Context) error {
 		err := auth.GetFile(c)
 
+		if c.Param("id") == "new" {
+			assert.Equal(t, true, auth.FileOwnerCheck(c))
+		}
+
 		if c.ParamInt("id") > 1 {
 			assert.Equal(t, true, entities.IsNotFound(err))
 			assert.Equal(t, nil, c.Locals("file"))
@@ -128,6 +154,7 @@ func TestHelpers(t *testing.T) {
 		return nil
 	})
 
+	mock.GetRequest(s, "/files/new")
 	mock.GetRequest(s, "/files/1")
 	mock.GetRequest(s, "/files/2")
 
@@ -148,6 +175,7 @@ func TestHelpers(t *testing.T) {
 		if c.Param("id") == "new" {
 			assert.Equal(t, nil, err)
 			assert.Equal(t, nil, c.Locals("post"))
+			assert.Equal(t, true, auth.PostOwnerCheck(c))
 		} else if c.ParamInt("id") == 1 {
 			assert.Equal(t, nil, err)
 
@@ -189,6 +217,7 @@ func TestHelpers(t *testing.T) {
 		if c.Param("id") == "new" {
 			assert.Equal(t, nil, err)
 			assert.Equal(t, nil, c.Locals("comment"))
+			assert.Equal(t, true, auth.CommentOwnerCheck(c))
 		} else if c.ParamInt("id") == 1 {
 			assert.Equal(t, nil, err)
 
@@ -204,11 +233,12 @@ func TestHelpers(t *testing.T) {
 			c.Locals("user", &entities.User{ID: 2})
 			assert.Equal(t, false, auth.CommentOwnerCheck(c))
 
+			c.Locals("user", nil)
+			assert.Equal(t, false, auth.CommentOwnerCheck(c))
+
 			c.Locals("comment", nil)
 			assert.Equal(t, false, auth.CommentOwnerCheck(c))
 
-			c.Locals("user", nil)
-			assert.Equal(t, false, auth.CommentOwnerCheck(c))
 		} else {
 			assert.Equal(t, true, entities.IsNotFound(err))
 			assert.Equal(t, nil, c.Locals("comment"))
@@ -264,13 +294,13 @@ func TestRoutes(t *testing.T) {
 	claims, ok := token.Claims.(*entities.UserJwtClaims)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, true, token.Valid)
-	assert.Equal(t, ga.MockNormalUser2.ID, claims.User.ID)
-	assert.Equal(t, ga.MockNormalUser2.Provider, claims.User.Provider)
-	assert.Equal(t, ga.MockNormalUser2.Username, claims.User.Username)
-	assert.Equal(t, ga.MockNormalUser2.Email, claims.User.Email)
-	assert.Equal(t, ga.MockNormalUser2.DisplayName, claims.User.DisplayName)
-	assert.Equal(t, ga.MockNormalUser2.RoleIDs, claims.User.RoleIDs)
-	assert.Equal(t, ga.MockNormalUser2.AvatarImageUrl, claims.User.AvatarImageUrl)
+	assert.Equal(t, mock.NormalUser2.ID, claims.User.ID)
+	assert.Equal(t, mock.NormalUser2.Provider, claims.User.Provider)
+	assert.Equal(t, mock.NormalUser2.Username, claims.User.Username)
+	assert.Equal(t, mock.NormalUser2.Email, claims.User.Email)
+	assert.Equal(t, mock.NormalUser2.DisplayName, claims.User.DisplayName)
+	assert.Equal(t, mock.NormalUser2.RoleIDs, claims.User.RoleIDs)
+	assert.Equal(t, mock.NormalUser2.AvatarImageUrl, claims.User.AvatarImageUrl)
 
 	s2 := fiber.New(fiber.Config{JwtSigningKey: config.APP_KEY})
 	s2.Use(func(c server.Context) error {
@@ -284,6 +314,17 @@ func TestRoutes(t *testing.T) {
 	_, resp = mock.GetRequest(s2, "/auth/mock/callback?code=mock_callback_code")
 	assert.Equal(t, "Error setting login info", logger.Messages[1].Params[0])
 	assert.Equal(t, http.StatusBadGateway, resp.StatusCode)
+
+	mockrepository.ErrorCreateIfNotExistsByProvider = true
+
+	body, _ = mock.GetRequest(s, "/auth/mock/callback?code=mock_callback_code")
+	assert.Equal(t, "Something went wrong", string(body))
+	assert.Equal(t, mock.MockLoggerMessage{
+		Type:   "Error",
+		Params: []interface{}{errors.New("CreateIfNotExistsByProvider error")},
+	}, logger.Last())
+
+	mockrepository.ErrorCreateIfNotExistsByProvider = false
 }
 
 func TestAssignUserInfo(t *testing.T) {
@@ -309,21 +350,21 @@ func TestAssignUserInfo(t *testing.T) {
 
 	s.Get("/validcookie", func(c server.Context) error {
 		assert.Equal(t, &entities.User{
-			ID:             ga.MockNormalUser2.ID,
-			Provider:       ga.MockNormalUser2.Provider,
-			Username:       ga.MockNormalUser2.Username,
-			Email:          ga.MockNormalUser2.Email,
-			DisplayName:    ga.MockNormalUser2.DisplayName,
-			RoleIDs:        ga.MockNormalUser2.RoleIDs,
-			Active:         ga.MockNormalUser2.Active,
-			Roles:          auth.GetRolesFromIDs(ga.MockNormalUser2.RoleIDs),
-			AvatarImageUrl: ga.MockNormalUser2.Avatar(),
+			ID:             mock.NormalUser2.ID,
+			Provider:       mock.NormalUser2.Provider,
+			Username:       mock.NormalUser2.Username,
+			Email:          mock.NormalUser2.Email,
+			DisplayName:    mock.NormalUser2.DisplayName,
+			RoleIDs:        mock.NormalUser2.RoleIDs,
+			Active:         mock.NormalUser2.Active,
+			Roles:          auth.GetRolesFromIDs(mock.NormalUser2.RoleIDs),
+			AvatarImageUrl: mock.NormalUser2.Avatar(),
 		}, c.User())
 		return nil
 	})
 
 	exp := time.Now().Add(time.Hour * 100 * 365 * 24)
-	jwtToken, _ := ga.MockNormalUser2.JwtClaim(exp)
+	jwtToken, _ := mock.NormalUser2.JwtClaim(exp)
 	mock.GetRequest(s, "/validcookie", map[string]string{
 		"cookie": config.APP_TOKEN_KEY + "=" + jwtToken,
 	})
@@ -351,7 +392,7 @@ func TestAuthCheck(t *testing.T) {
 	}))
 
 	exp := time.Now().Add(time.Hour * 100 * 365 * 24)
-	jwtToken, _ := ga.MockNormalUser2.JwtClaim(exp)
+	jwtToken, _ := mock.NormalUser2.JwtClaim(exp)
 	validAuthHeader := map[string]string{"cookie": config.APP_TOKEN_KEY + "=" + jwtToken}
 	body, resp := mock.GetRequest(s, "/withauthconfigprepareerror", validAuthHeader)
 	assert.Equal(t, "prepare error", body)
@@ -409,8 +450,8 @@ func TestInactiveUser(t *testing.T) {
 	var resp *http.Response
 	exp := time.Now().Add(time.Hour * 100 * 365 * 24)
 
-	ga.MockNormalUser2.Active = false
-	jwtTokenNormalUser2, _ := ga.MockNormalUser2.JwtClaim(exp)
+	mock.NormalUser2.Active = false
+	jwtTokenNormalUser2, _ := mock.NormalUser2.JwtClaim(exp)
 	authHeaderNormalUser2 := map[string]string{"cookie": config.APP_TOKEN_KEY + "=" + jwtTokenNormalUser2}
 
 	s = createServerWithAuthConfig("inactiveuser.post.view.perm_none")
@@ -425,7 +466,7 @@ func TestInactiveUser(t *testing.T) {
 	_, resp = mock.GetRequest(s, "/posts/2", authHeaderNormalUser2)
 	assert.Equal(t, http.StatusFound, resp.StatusCode)
 	assert.Equal(t, "/inactive", resp.Header["Location"][0])
-	ga.MockNormalUser2.Active = true
+	mock.NormalUser2.Active = true
 }
 
 func TestUserViewPostAllActionConfigs(t *testing.T) {
@@ -434,10 +475,10 @@ func TestUserViewPostAllActionConfigs(t *testing.T) {
 	var resp *http.Response
 	exp := time.Now().Add(time.Hour * 100 * 365 * 24)
 
-	jwtTokenNormalUser2, _ := ga.MockNormalUser2.JwtClaim(exp)
+	jwtTokenNormalUser2, _ := mock.NormalUser2.JwtClaim(exp)
 	authHeaderNormalUser2 := map[string]string{"cookie": config.APP_TOKEN_KEY + "=" + jwtTokenNormalUser2}
 
-	jwtTokenNormalUser3, _ := ga.MockNormalUser3.JwtClaim(exp)
+	jwtTokenNormalUser3, _ := mock.NormalUser3.JwtClaim(exp)
 	authHeaderNormalUser3 := map[string]string{"cookie": config.APP_TOKEN_KEY + "=" + jwtTokenNormalUser3}
 
 	// Action that allow no one to access
@@ -508,7 +549,7 @@ func TestRootUserAllActionConfigs(t *testing.T) {
 	var resp *http.Response
 	exp := time.Now().Add(time.Hour * 100 * 365 * 24)
 
-	jwtTokenRootUser, _ := ga.MockRootUser.JwtClaim(exp)
+	jwtTokenRootUser, _ := mock.RootUser.JwtClaim(exp)
 	authHeaderRootUser := map[string]string{"cookie": config.APP_TOKEN_KEY + "=" + jwtTokenRootUser}
 
 	s = createServerWithAuthConfig("root.post.view.perm_none")

@@ -63,6 +63,11 @@ func TestEntities(t *testing.T) {
 	filter.BaseUrl = ""
 	assert.Equal(t, "/?q=search", filter.Base())
 
+	filterEmpty := &entities.Filter{
+		BaseUrl: "/test",
+	}
+	assert.Equal(t, "/test", filterEmpty.Base())
+
 	meta1 := &entities.Meta{}
 	assert.Equal(t, config.Setting("app_name"), meta1.GetTitle())
 
@@ -135,6 +140,13 @@ func TestComment(t *testing.T) {
 	assert.Equal(t, "/comment?parent=1&post=1&q=test&user=1", commentFilter.Base())
 	commentFilter.IgnoreUrlParams = []string{"parent", "user"}
 	assert.Equal(t, "/comment?post=1&q=test", commentFilter.Base())
+
+	commentFilterEmpty := &entities.CommentFilter{
+		Filter: &entities.Filter{
+			BaseUrl: "/comment",
+		},
+	}
+	assert.Equal(t, "/comment", commentFilterEmpty.Base())
 }
 
 func TestFile(t *testing.T) {
@@ -150,8 +162,14 @@ func TestFile(t *testing.T) {
 		},
 		UserIDs: []int{1, 2},
 	}
-
 	assert.Equal(t, "/file?q=test&user=1", fileFilter.Base())
+
+	fileFilterEmpty := &entities.FileFilter{
+		Filter: &entities.Filter{
+			BaseUrl: "/file",
+		},
+	}
+	assert.Equal(t, "/file", fileFilterEmpty.Base())
 
 	fs.New("disk_mock", []fs.FSDisk{&mock.Disk{}})
 	file := &entities.File{
@@ -163,6 +181,14 @@ func TestFile(t *testing.T) {
 	assert.Equal(t, nil, file.Delete(context.Background()))
 	file.Path = "/delete/error"
 	assert.Equal(t, errors.New("Delete file error"), file.Delete(context.Background()))
+
+	fileInvalidDisk := &entities.File{
+		ID:   1,
+		Disk: "invalid_disk",
+		Path: "test/file.jpg",
+	}
+	assert.Equal(t, "", fileInvalidDisk.Url())
+	assert.Equal(t, errors.New("disk not found"), fileInvalidDisk.Delete(context.Background()))
 
 	file.Disk = ""
 	assert.Equal(t, "", file.Url())
@@ -183,13 +209,19 @@ func TestPermission(t *testing.T) {
 		},
 		RoleIDs: []int{1, 2},
 	}
-
 	assert.Equal(t, "/permission?q=test&role=1", permissionFilter.Base())
+
+	permissionFilterEmpty := &entities.PermissionFilter{
+		Filter: &entities.Filter{
+			BaseUrl: "/permission",
+		},
+	}
+	assert.Equal(t, "/permission", permissionFilterEmpty.Base())
 }
 
 func TestPost(t *testing.T) {
 	post := &entities.Post{ID: 1, Slug: "test-post"}
-	assert.Equal(t, config.Url("/test-post-1.html"), post.Url())
+	assert.Equal(t, utils.Url("/test-post-1.html"), post.Url())
 	postFilter := &entities.PostFilter{
 		Filter: &entities.Filter{
 			BaseUrl:         "/post",
@@ -201,11 +233,43 @@ func TestPost(t *testing.T) {
 			ExcludeIDs:      []int{1, 2},
 		},
 		Publish:  "draft",
+		Approve:  "pending",
 		TopicIDs: []int{1, 2},
 		UserIDs:  []int{1, 2},
 	}
+	assert.Equal(t, "/post?approve=pending&publish=draft&q=test&topic=1&user=1", postFilter.Base())
 
-	assert.Equal(t, "/post?publish=draft&q=test&topic=1&user=1", postFilter.Base())
+	postFilterEmpty := &entities.PostFilter{
+		Filter: &entities.Filter{
+			BaseUrl: "/post",
+		},
+	}
+	assert.Equal(t, "/post", postFilterEmpty.Base())
+}
+
+func TestPage(t *testing.T) {
+	page := &entities.Page{ID: 1, Slug: "about"}
+	assert.Equal(t, utils.Url("/about.html"), page.Url())
+	pageFilter := &entities.PageFilter{
+		Filter: &entities.Filter{
+			BaseUrl:         "/page",
+			Search:          "test",
+			Page:            2,
+			Limit:           10,
+			Sorts:           []*entities.Sort{{"created_at", "desc"}},
+			IgnoreUrlParams: []string{},
+			ExcludeIDs:      []int{1, 2},
+		},
+		Publish: "draft",
+	}
+	assert.Equal(t, "/page?publish=draft&q=test", pageFilter.Base())
+
+	pageFilterEmpty := &entities.PageFilter{
+		Filter: &entities.Filter{
+			BaseUrl: "/page",
+		},
+	}
+	assert.Equal(t, "/page", pageFilterEmpty.Base())
 }
 
 func TestRole(t *testing.T) {
@@ -232,14 +296,20 @@ func TestRole(t *testing.T) {
 			ExcludeIDs:      []int{1, 2},
 		},
 	}
-
 	assert.Equal(t, "/role?q=test", roleFilter.Base())
+
+	roleFilterEmpty := &entities.RoleFilter{
+		Filter: &entities.Filter{
+			BaseUrl: "/role",
+		},
+	}
+	assert.Equal(t, "/role", roleFilterEmpty.Base())
 }
 
 func TestTopic(t *testing.T) {
 	topic := &entities.Topic{ID: 1, Slug: "test-topic"}
-	assert.Equal(t, config.Url("/test-topic"), topic.Url())
-	assert.Equal(t, config.Url("/test-topic/feed"), topic.FeedUrl())
+	assert.Equal(t, utils.Url("/test-topic"), topic.Url())
+	assert.Equal(t, utils.Url("/test-topic/feed"), topic.FeedUrl())
 
 	topic1 := &entities.Topic{ID: 1, Name: "Topic 1", Slug: "test-topic-1"}
 	topic2 := &entities.Topic{ID: 2, Name: "Topic 2", Slug: "test-topic-2"}
@@ -266,8 +336,6 @@ func TestTopic(t *testing.T) {
 		topic5,
 	}
 
-	// assert.Equal(t, topicTreePrint, entities.GetTopicsTree(topics, 0, 0, []int{0}))
-
 	print := entities.PrintTopicsTree(topicTreePrint, []int{0})
 	assert.Equal(t, print[3].Name, "--Topic 4")
 	assert.Equal(t, print[4].Name, "----Topic 5")
@@ -289,13 +357,19 @@ func TestTopic(t *testing.T) {
 			ExcludeIDs:      []int{1, 2},
 		},
 	}
-
 	assert.Equal(t, "/topic?q=test", topicFilter.Base())
+
+	topicFilterEmpty := &entities.TopicFilter{
+		Filter: &entities.Filter{
+			BaseUrl: "/topic",
+		},
+	}
+	assert.Equal(t, "/topic", topicFilterEmpty.Base())
 }
 
 func TestUser(t *testing.T) {
 	user := &entities.User{ID: 1, Username: "test-user"}
-	assert.Equal(t, config.Url("/u/test-user"), user.Url())
+	assert.Equal(t, utils.Url("/u/test-user"), user.Url())
 	assert.Equal(t, "", user.Avatar())
 	user.ProviderAvatar = "http://provider.local/avatar.png"
 	assert.Equal(t, "http://provider.local/avatar.png", user.Avatar())
@@ -321,12 +395,22 @@ func TestUser(t *testing.T) {
 	assert.Equal(t, "test-user", user.Name())
 	user.DisplayName = "Test User"
 	assert.Equal(t, "Test User", user.Name())
+	assert.Equal(t, `<a class="avatar" href="/u/test-user" title="Test User" target="_blank"><img src="/disk_mock/test/file.jpg" width="50" height="50" alt="Test User" /></a>`, user.AvatarElm("50", "50", false))
+	assert.Equal(t, `<img src="/disk_mock/test/file.jpg" width="50" height="50" alt="Test User" />`, user.AvatarElm("50", "50", true))
 
 	token, err := user.JwtClaim(time.Now().Add(time.Hour*24*7), map[string]interface{}{
 		"test": "test",
 	})
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, token != "")
+
+	var nilUser *entities.User
+
+	assert.Equal(t, false, nilUser.IsRoot())
+	assert.Equal(t, "", nilUser.Name())
+	assert.Equal(t, "", nilUser.Url())
+	assert.Equal(t, "", nilUser.Avatar())
+	assert.Equal(t, `<span class="avatar none"></span>`, nilUser.AvatarElm("50", "50", false))
 
 	userFilter := &entities.UserFilter{
 		Filter: &entities.Filter{
@@ -339,6 +423,12 @@ func TestUser(t *testing.T) {
 			ExcludeIDs:      []int{1, 2},
 		},
 	}
-
 	assert.Equal(t, "/user?q=test", userFilter.Base())
+
+	userFilterEmpty := &entities.UserFilter{
+		Filter: &entities.Filter{
+			BaseUrl: "/user",
+		},
+	}
+	assert.Equal(t, "/user", userFilterEmpty.Base())
 }

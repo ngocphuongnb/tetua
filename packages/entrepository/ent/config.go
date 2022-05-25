@@ -26,6 +26,7 @@ type config struct {
 type hooks struct {
 	Comment    []ent.Hook
 	File       []ent.Hook
+	Page       []ent.Hook
 	Permission []ent.Hook
 	Post       []ent.Hook
 	Role       []ent.Hook

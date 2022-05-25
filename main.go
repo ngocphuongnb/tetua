@@ -21,13 +21,11 @@ import (
 	"github.com/ngocphuongnb/tetua/app/repositories"
 
 	"github.com/ngocphuongnb/tetua/app/web"
-	ga "github.com/ngocphuongnb/tetua/packages/auth"
+	sa "github.com/ngocphuongnb/tetua/packages/auth"
 	ent "github.com/ngocphuongnb/tetua/packages/entrepository"
 	"github.com/ngocphuongnb/tetua/packages/rclonefs"
 	zap "github.com/ngocphuongnb/tetua/packages/zaplogger"
 	"github.com/urfave/cli/v2"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/github"
 )
 
 func prepare(workingDir string) {
@@ -44,15 +42,12 @@ func prepare(workingDir string) {
 		config.STORAGES.DefaultDisk,
 		rclonefs.NewFromConfig(config.STORAGES),
 	)
-	auth.New(
-		ga.NewLocal(),
-		ga.NewGithub(&oauth2.Config{
-			ClientID:     config.GITHUB_CLIENT_ID,
-			ClientSecret: config.GITHUB_CLIENT_SECRET,
-			RedirectURL:  config.Url("/auth/github/callback"),
-			Endpoint:     github.Endpoint,
-		}),
-	)
+	auth.New(map[string]auth.NewProviderFn{
+		"local":   sa.NewLocal,
+		"github":  sa.NewGithub,
+		"google":  sa.NewGoogle,
+		"twitter": sa.NewTwitter,
+	})
 
 	if err := cache.All(); err != nil {
 		log.Fatal("Cache error", err)
@@ -71,14 +66,8 @@ func getWd(c *cli.Context) string {
 		os.Exit(1)
 	}
 
-	// if err := os.Chdir(workingDir); err != nil {
-	// 	fmt.Println("Can't change directory", err)
-	// 	os.Exit(1)
-	// }
-
 	return workingDir
 }
-
 func main() {
 	app := &cli.App{
 		Name:  "tetua",
@@ -90,6 +79,7 @@ func main() {
 				Usage:   "Start tetua server",
 				Action: func(c *cli.Context) error {
 					prepare(getWd(c))
+
 					web.NewServer(web.Config{
 						JwtSigningKey: config.APP_KEY,
 						Theme:         config.APP_THEME,

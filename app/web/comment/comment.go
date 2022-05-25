@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/entities"
 	"github.com/ngocphuongnb/tetua/app/repositories"
 	"github.com/ngocphuongnb/tetua/app/server"
@@ -15,7 +14,7 @@ import (
 func List(c server.Context) error {
 	paginate, err := repositories.Comment.PaginateWithPost(c.Context(), &entities.CommentFilter{
 		Filter: &entities.Filter{
-			BaseUrl:         config.Url("/comments"),
+			BaseUrl:         utils.Url("/comments"),
 			Page:            c.QueryInt("page"),
 			IgnoreUrlParams: []string{"user"},
 		},

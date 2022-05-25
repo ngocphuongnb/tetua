@@ -5,6 +5,7 @@ package ent
 import (
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/comment"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/file"
+	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/page"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/permission"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/post"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/predicate"
@@ -21,7 +22,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 8)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 9)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   comment.Table,
@@ -67,6 +68,28 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
+			Table:   page.Table,
+			Columns: page.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: page.FieldID,
+			},
+		},
+		Type: "Page",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			page.FieldCreatedAt:       {Type: field.TypeTime, Column: page.FieldCreatedAt},
+			page.FieldUpdatedAt:       {Type: field.TypeTime, Column: page.FieldUpdatedAt},
+			page.FieldDeletedAt:       {Type: field.TypeTime, Column: page.FieldDeletedAt},
+			page.FieldName:            {Type: field.TypeString, Column: page.FieldName},
+			page.FieldSlug:            {Type: field.TypeString, Column: page.FieldSlug},
+			page.FieldContent:         {Type: field.TypeString, Column: page.FieldContent},
+			page.FieldContentHTML:     {Type: field.TypeString, Column: page.FieldContentHTML},
+			page.FieldDraft:           {Type: field.TypeBool, Column: page.FieldDraft},
+			page.FieldFeaturedImageID: {Type: field.TypeInt, Column: page.FieldFeaturedImageID},
+		},
+	}
+	graph.Nodes[3] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
 			Table:   permission.Table,
 			Columns: permission.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -84,7 +107,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			permission.FieldValue:     {Type: field.TypeString, Column: permission.FieldValue},
 		},
 	}
-	graph.Nodes[3] = &sqlgraph.Node{
+	graph.Nodes[4] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   post.Table,
 			Columns: post.Columns,
@@ -113,7 +136,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			post.FieldUserID:          {Type: field.TypeInt, Column: post.FieldUserID},
 		},
 	}
-	graph.Nodes[4] = &sqlgraph.Node{
+	graph.Nodes[5] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   role.Table,
 			Columns: role.Columns,
@@ -132,7 +155,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			role.FieldRoot:        {Type: field.TypeBool, Column: role.FieldRoot},
 		},
 	}
-	graph.Nodes[5] = &sqlgraph.Node{
+	graph.Nodes[6] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   setting.Table,
 			Columns: setting.Columns,
@@ -151,7 +174,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			setting.FieldType:      {Type: field.TypeString, Column: setting.FieldType},
 		},
 	}
-	graph.Nodes[6] = &sqlgraph.Node{
+	graph.Nodes[7] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   topic.Table,
 			Columns: topic.Columns,
@@ -173,7 +196,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			topic.FieldParentID:    {Type: field.TypeInt, Column: topic.FieldParentID},
 		},
 	}
-	graph.Nodes[7] = &sqlgraph.Node{
+	graph.Nodes[8] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -275,6 +298,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Post",
 	)
 	graph.MustAddE(
+		"pages",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   file.PagesTable,
+			Columns: []string{file.PagesColumn},
+			Bidi:    false,
+		},
+		"File",
+		"Page",
+	)
+	graph.MustAddE(
 		"user_avatars",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -285,6 +320,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"File",
 		"User",
+	)
+	graph.MustAddE(
+		"featured_image",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   page.FeaturedImageTable,
+			Columns: []string{page.FeaturedImageColumn},
+			Bidi:    false,
+		},
+		"Page",
+		"File",
 	)
 	graph.MustAddE(
 		"role",
@@ -722,6 +769,20 @@ func (f *FileFilter) WhereHasPostsWith(preds ...predicate.Post) {
 	})))
 }
 
+// WhereHasPages applies a predicate to check if query has an edge pages.
+func (f *FileFilter) WhereHasPages() {
+	f.Where(entql.HasEdge("pages"))
+}
+
+// WhereHasPagesWith applies a predicate to check if query has an edge pages with a given conditions (other predicates).
+func (f *FileFilter) WhereHasPagesWith(preds ...predicate.Page) {
+	f.Where(entql.HasEdgeWith("pages", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
 // WhereHasUserAvatars applies a predicate to check if query has an edge user_avatars.
 func (f *FileFilter) WhereHasUserAvatars() {
 	f.Where(entql.HasEdge("user_avatars"))
@@ -730,6 +791,104 @@ func (f *FileFilter) WhereHasUserAvatars() {
 // WhereHasUserAvatarsWith applies a predicate to check if query has an edge user_avatars with a given conditions (other predicates).
 func (f *FileFilter) WhereHasUserAvatarsWith(preds ...predicate.User) {
 	f.Where(entql.HasEdgeWith("user_avatars", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (pq *PageQuery) addPredicate(pred func(s *sql.Selector)) {
+	pq.predicates = append(pq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the PageQuery builder.
+func (pq *PageQuery) Filter() *PageFilter {
+	return &PageFilter{pq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *PageMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the PageMutation builder.
+func (m *PageMutation) Filter() *PageFilter {
+	return &PageFilter{m}
+}
+
+// PageFilter provides a generic filtering capability at runtime for PageQuery.
+type PageFilter struct {
+	predicateAdder
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *PageFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *PageFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(page.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *PageFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(page.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *PageFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(page.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
+func (f *PageFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(page.FieldDeletedAt))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *PageFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(page.FieldName))
+}
+
+// WhereSlug applies the entql string predicate on the slug field.
+func (f *PageFilter) WhereSlug(p entql.StringP) {
+	f.Where(p.Field(page.FieldSlug))
+}
+
+// WhereContent applies the entql string predicate on the content field.
+func (f *PageFilter) WhereContent(p entql.StringP) {
+	f.Where(p.Field(page.FieldContent))
+}
+
+// WhereContentHTML applies the entql string predicate on the content_html field.
+func (f *PageFilter) WhereContentHTML(p entql.StringP) {
+	f.Where(p.Field(page.FieldContentHTML))
+}
+
+// WhereDraft applies the entql bool predicate on the draft field.
+func (f *PageFilter) WhereDraft(p entql.BoolP) {
+	f.Where(p.Field(page.FieldDraft))
+}
+
+// WhereFeaturedImageID applies the entql int predicate on the featured_image_id field.
+func (f *PageFilter) WhereFeaturedImageID(p entql.IntP) {
+	f.Where(p.Field(page.FieldFeaturedImageID))
+}
+
+// WhereHasFeaturedImage applies a predicate to check if query has an edge featured_image.
+func (f *PageFilter) WhereHasFeaturedImage() {
+	f.Where(entql.HasEdge("featured_image"))
+}
+
+// WhereHasFeaturedImageWith applies a predicate to check if query has an edge featured_image with a given conditions (other predicates).
+func (f *PageFilter) WhereHasFeaturedImageWith(preds ...predicate.File) {
+	f.Where(entql.HasEdgeWith("featured_image", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -764,7 +923,7 @@ type PermissionFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *PermissionFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -847,7 +1006,7 @@ type PostFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *PostFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1022,7 +1181,7 @@ type RoleFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RoleFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1119,7 +1278,7 @@ type SettingFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *SettingFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1188,7 +1347,7 @@ type TopicFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TopicFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1314,7 +1473,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[8].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

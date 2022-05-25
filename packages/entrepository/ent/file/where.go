@@ -918,6 +918,34 @@ func HasPostsWith(preds ...predicate.Post) predicate.File {
 	})
 }
 
+// HasPages applies the HasEdge predicate on the "pages" edge.
+func HasPages() predicate.File {
+	return predicate.File(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PagesTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PagesTable, PagesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPagesWith applies the HasEdge predicate on the "pages" edge with a given conditions (other predicates).
+func HasPagesWith(preds ...predicate.Page) predicate.File {
+	return predicate.File(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PagesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PagesTable, PagesColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasUserAvatars applies the HasEdge predicate on the "user_avatars" edge.
 func HasUserAvatars() predicate.File {
 	return predicate.File(func(s *sql.Selector) {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/comment"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/file"
+	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/page"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/permission"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/post"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/role"
@@ -32,6 +33,8 @@ type Client struct {
 	Comment *CommentClient
 	// File is the client for interacting with the File builders.
 	File *FileClient
+	// Page is the client for interacting with the Page builders.
+	Page *PageClient
 	// Permission is the client for interacting with the Permission builders.
 	Permission *PermissionClient
 	// Post is the client for interacting with the Post builders.
@@ -59,6 +62,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Comment = NewCommentClient(c.config)
 	c.File = NewFileClient(c.config)
+	c.Page = NewPageClient(c.config)
 	c.Permission = NewPermissionClient(c.config)
 	c.Post = NewPostClient(c.config)
 	c.Role = NewRoleClient(c.config)
@@ -100,6 +104,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:     cfg,
 		Comment:    NewCommentClient(cfg),
 		File:       NewFileClient(cfg),
+		Page:       NewPageClient(cfg),
 		Permission: NewPermissionClient(cfg),
 		Post:       NewPostClient(cfg),
 		Role:       NewRoleClient(cfg),
@@ -127,6 +132,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:     cfg,
 		Comment:    NewCommentClient(cfg),
 		File:       NewFileClient(cfg),
+		Page:       NewPageClient(cfg),
 		Permission: NewPermissionClient(cfg),
 		Post:       NewPostClient(cfg),
 		Role:       NewRoleClient(cfg),
@@ -164,6 +170,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.Comment.Use(hooks...)
 	c.File.Use(hooks...)
+	c.Page.Use(hooks...)
 	c.Permission.Use(hooks...)
 	c.Post.Use(hooks...)
 	c.Role.Use(hooks...)
@@ -443,6 +450,22 @@ func (c *FileClient) QueryPosts(f *File) *PostQuery {
 	return query
 }
 
+// QueryPages queries the pages edge of a File.
+func (c *FileClient) QueryPages(f *File) *PageQuery {
+	query := &PageQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(file.Table, file.FieldID, id),
+			sqlgraph.To(page.Table, page.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, file.PagesTable, file.PagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryUserAvatars queries the user_avatars edge of a File.
 func (c *FileClient) QueryUserAvatars(f *File) *UserQuery {
 	query := &UserQuery{config: c.config}
@@ -462,6 +485,112 @@ func (c *FileClient) QueryUserAvatars(f *File) *UserQuery {
 // Hooks returns the client hooks.
 func (c *FileClient) Hooks() []Hook {
 	return c.hooks.File
+}
+
+// PageClient is a client for the Page schema.
+type PageClient struct {
+	config
+}
+
+// NewPageClient returns a client for the Page from the given config.
+func NewPageClient(c config) *PageClient {
+	return &PageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `page.Hooks(f(g(h())))`.
+func (c *PageClient) Use(hooks ...Hook) {
+	c.hooks.Page = append(c.hooks.Page, hooks...)
+}
+
+// Create returns a create builder for Page.
+func (c *PageClient) Create() *PageCreate {
+	mutation := newPageMutation(c.config, OpCreate)
+	return &PageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Page entities.
+func (c *PageClient) CreateBulk(builders ...*PageCreate) *PageCreateBulk {
+	return &PageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Page.
+func (c *PageClient) Update() *PageUpdate {
+	mutation := newPageMutation(c.config, OpUpdate)
+	return &PageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PageClient) UpdateOne(pa *Page) *PageUpdateOne {
+	mutation := newPageMutation(c.config, OpUpdateOne, withPage(pa))
+	return &PageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PageClient) UpdateOneID(id int) *PageUpdateOne {
+	mutation := newPageMutation(c.config, OpUpdateOne, withPageID(id))
+	return &PageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Page.
+func (c *PageClient) Delete() *PageDelete {
+	mutation := newPageMutation(c.config, OpDelete)
+	return &PageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *PageClient) DeleteOne(pa *Page) *PageDeleteOne {
+	return c.DeleteOneID(pa.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *PageClient) DeleteOneID(id int) *PageDeleteOne {
+	builder := c.Delete().Where(page.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PageDeleteOne{builder}
+}
+
+// Query returns a query builder for Page.
+func (c *PageClient) Query() *PageQuery {
+	return &PageQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Page entity by its id.
+func (c *PageClient) Get(ctx context.Context, id int) (*Page, error) {
+	return c.Query().Where(page.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PageClient) GetX(ctx context.Context, id int) *Page {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryFeaturedImage queries the featured_image edge of a Page.
+func (c *PageClient) QueryFeaturedImage(pa *Page) *FileQuery {
+	query := &FileQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(page.Table, page.FieldID, id),
+			sqlgraph.To(file.Table, file.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, page.FeaturedImageTable, page.FeaturedImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PageClient) Hooks() []Hook {
+	return c.hooks.Page
 }
 
 // PermissionClient is a client for the Permission schema.

@@ -7,7 +7,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/entities"
 	"github.com/ngocphuongnb/tetua/app/repositories"
 	"github.com/ngocphuongnb/tetua/app/server"
@@ -18,7 +17,7 @@ import (
 func List(c server.Context) error {
 	paginate, err := repositories.Post.Paginate(c.Context(), &entities.PostFilter{
 		Filter: &entities.Filter{
-			BaseUrl:         config.Url("/posts"),
+			BaseUrl:         utils.Url("/posts"),
 			Page:            c.QueryInt("page"),
 			IgnoreUrlParams: []string{"user"},
 		},
@@ -54,8 +53,8 @@ func View(c server.Context) error {
 	var slug = c.Param("slug")
 	var slugParts = strings.Split(slug, "-")
 
-	if len(slugParts) == 0 {
-		return c.Status(http.StatusNotFound).Render(views.Error("Post not found"))
+	if len(slugParts) < 2 {
+		return ViewPage(c)
 	}
 
 	var slugId = slugParts[len(slugParts)-1]
@@ -65,15 +64,11 @@ func View(c server.Context) error {
 	var postId, err = strconv.Atoi(slugId)
 
 	if err != nil {
-		c.WithError("Invalid post id", err)
-		return c.Status(http.StatusNotFound).Render(views.Error("Post not found"))
+		return ViewPage(c)
 	}
 
 	if post, err = repositories.Post.PublishedPostByID(c.Context(), postId); err != nil || post == nil {
-		if err != nil {
-			c.WithError("Error finding post", err)
-		}
-		return c.Status(http.StatusNotFound).Render(views.Error("Post not found"))
+		return ViewPage(c)
 	}
 
 	postSlug := fmt.Sprintf("%s-%d", post.Slug, post.ID)

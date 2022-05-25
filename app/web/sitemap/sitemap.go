@@ -6,9 +6,9 @@ import (
 	"math"
 	"net/http"
 
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/repositories"
 	"github.com/ngocphuongnb/tetua/app/server"
+	"github.com/ngocphuongnb/tetua/app/utils"
 )
 
 func Index(c server.Context) error {
@@ -27,18 +27,18 @@ func Index(c server.Context) error {
 
 	sitemapIndex.Items = []*SitemapItem{{
 		Loc: &SitemapLoc{
-			Value: config.Url("/sitemap/topics.xml"),
+			Value: utils.Url("/sitemap/topics.xml"),
 		},
 	}, {
 		Loc: &SitemapLoc{
-			Value: config.Url("/sitemap/users.xml"),
+			Value: utils.Url("/sitemap/users.xml"),
 		},
 	}}
 
 	for i := 0; i < totalPages; i++ {
 		sitemapIndex.Items = append(sitemapIndex.Items, &SitemapItem{
 			Loc: &SitemapLoc{
-				Value: config.Url(fmt.Sprintf("/sitemap/posts-%d.xml", i+1)),
+				Value: utils.Url(fmt.Sprintf("/sitemap/posts-%d.xml", i+1)),
 			},
 		})
 	}

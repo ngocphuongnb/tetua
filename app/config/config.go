@@ -5,49 +5,70 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	mathrand "math/rand"
 	"os"
 	"path"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/ngocphuongnb/tetua/app/fs"
-	"github.com/ngocphuongnb/tetua/app/utils"
 )
 
+type SmtpConfig struct {
+	Secure bool   `json:"secure"`
+	Host   string `json:"host"`
+	Port   int    `json:"port"`
+	User   string `json:"user"`
+	Pass   string `json:"pass"`
+}
+
+type MailConfig struct {
+	Sender string      `json:"sender"`
+	Smtp   *SmtpConfig `json:"smtp"`
+}
+
+type AuthConfig struct {
+	EnabledProviders []string                     `json:"enabled_providers"`
+	Providers        map[string]map[string]string `json:"providers"`
+}
+
 type ConfigFile struct {
-	APP_ENV              string            `json:"app_env"`
-	APP_KEY              string            `json:"app_key"`
-	APP_TOKEN_KEY        string            `json:"app_token_key,omitempty"`
-	APP_PORT             string            `json:"app_port"`
-	APP_THEME            string            `json:"app_theme,omitempty"`
-	DB_DSN               string            `json:"db_dsn"`
-	GITHUB_CLIENT_ID     string            `json:"github_client_id"`
-	GITHUB_CLIENT_SECRET string            `json:"github_client_secret"`
-	COOKIE_UUID          string            `json:"cookie_uuid,omitempty"`
-	SHOW_TETUA_BLOCK     bool              `json:"show_tetua_block,omitempty"`
-	DB_QUERY_LOGGING     bool              `json:"db_query_logging"`
-	STORAGES             *fs.StorageConfig `json:"storage,omitempty"`
+	APP_ENV          string            `json:"app_env"`
+	APP_KEY          string            `json:"app_key"`
+	APP_TOKEN_KEY    string            `json:"app_token_key,omitempty"`
+	APP_PORT         string            `json:"app_port"`
+	APP_THEME        string            `json:"app_theme,omitempty"`
+	DB_DSN           string            `json:"db_dsn"`
+	COOKIE_UUID      string            `json:"cookie_uuid,omitempty"`
+	SHOW_TETUA_BLOCK bool              `json:"show_tetua_block,omitempty"`
+	DB_QUERY_LOGGING bool              `json:"db_query_logging"`
+	STORAGES         *fs.StorageConfig `json:"storage,omitempty"`
+	Mail             *MailConfig       `json:"mail,omitempty"`
+	Auth             *AuthConfig       `json:"auth,omitempty"`
 }
 
 var (
-	WD                   = "."
-	DEVELOPMENT          = false
-	APP_VERSION          = "0.0.1"
-	STORAGES             = &fs.StorageConfig{}
-	APP_ENV              = ""
-	APP_KEY              = ""
-	APP_TOKEN_KEY        = "token"
-	APP_PORT             = "3000"
-	APP_THEME            = "default"
-	DB_DSN               = ""
-	DB_QUERY_LOGGING     = false
-	GITHUB_CLIENT_ID     = ""
-	GITHUB_CLIENT_SECRET = ""
-	ROOT_DIR             = ""
-	PUBLIC_DIR           = "public"
-	PRIVATE_DIR          = "private"
-	COOKIE_UUID          = "uuid"
-	SHOW_TETUA_BLOCK     = false
+	WD               = "."
+	DEVELOPMENT      = false
+	APP_VERSION      = "0.0.1"
+	STORAGES         = &fs.StorageConfig{}
+	APP_ENV          = ""
+	APP_KEY          = ""
+	APP_TOKEN_KEY    = "token"
+	APP_PORT         = "3000"
+	APP_THEME        = "default"
+	DB_DSN           = ""
+	DB_QUERY_LOGGING = false
+	ROOT_DIR         = ""
+	PUBLIC_DIR       = "public"
+	PRIVATE_DIR      = "private"
+	COOKIE_UUID      = "uuid"
+	SHOW_TETUA_BLOCK = false
 )
+
+var Mail *MailConfig
+var Auth *AuthConfig
 
 func ConfigError(name string) {
 	panic(fmt.Sprintf(
@@ -66,7 +87,8 @@ func Init(workingDir string) {
 	DEVELOPMENT = APP_ENV == "development"
 
 	if DEVELOPMENT {
-		ROOT_DIR = utils.GetRootDir()
+		_, mainFile, _, _ := runtime.Caller(2)
+		ROOT_DIR = filepath.Dir(mainFile)
 	}
 
 	if APP_KEY == "" {
@@ -76,18 +98,6 @@ func Init(workingDir string) {
 	if DB_DSN == "" {
 		ConfigError("DB_DSN")
 	}
-}
-
-func Url(path string) string {
-	appBase := strings.TrimRight(Setting("app_base_url"), "/")
-
-	if path == "" {
-		return appBase + "/"
-	}
-
-	path = strings.TrimLeft(path, "/")
-	path = fmt.Sprintf("%s/%s", appBase, path)
-	return path
 }
 
 func CreateConfigFile(workingDir string) (err error) {
@@ -102,7 +112,15 @@ func CreateConfigFile(workingDir string) (err error) {
 	cfg.APP_ENV = "production"
 	cfg.SHOW_TETUA_BLOCK = false
 	cfg.APP_PORT = APP_PORT
-	cfg.APP_KEY = utils.RandomString(32)
+
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	randBytes := make([]rune, 32)
+
+	for i := range randBytes {
+		randBytes[i] = letters[mathrand.Intn(len(letters))]
+	}
+
+	cfg.APP_KEY = string(randBytes)
 
 	file, err := json.MarshalIndent(cfg, "", " ")
 	if err != nil {
@@ -129,6 +147,9 @@ func parseConfigFile() {
 			panic(err)
 		}
 
+		Mail = cfg.Mail
+		Auth = cfg.Auth
+
 		if cfg.APP_ENV != "" {
 			APP_ENV = cfg.APP_ENV
 		}
@@ -151,14 +172,6 @@ func parseConfigFile() {
 
 		if cfg.APP_THEME != "" {
 			APP_THEME = cfg.APP_THEME
-		}
-
-		if cfg.GITHUB_CLIENT_ID != "" {
-			GITHUB_CLIENT_ID = cfg.GITHUB_CLIENT_ID
-		}
-
-		if cfg.GITHUB_CLIENT_SECRET != "" {
-			GITHUB_CLIENT_SECRET = cfg.GITHUB_CLIENT_SECRET
 		}
 
 		if cfg.COOKIE_UUID != "" {
@@ -190,9 +203,17 @@ func parseConfigFile() {
 
 			if cfg.STORAGES.DiskConfigs != nil && len(cfg.STORAGES.DiskConfigs) > 0 {
 				for _, disk := range cfg.STORAGES.DiskConfigs {
-					STORAGES.DiskConfigs = utils.SliceAppendIfNotExists(STORAGES.DiskConfigs, disk, func(t *fs.DiskConfig) bool {
-						return t.Name == disk.Name
-					})
+					diskExisted := false
+					for _, currentDisk := range STORAGES.DiskConfigs {
+						if currentDisk.Name == disk.Name {
+							diskExisted = true
+							break
+						}
+					}
+
+					if !diskExisted {
+						STORAGES.DiskConfigs = append(STORAGES.DiskConfigs, disk)
+					}
 				}
 			}
 		}
@@ -222,14 +243,6 @@ func parseENV() {
 
 	if os.Getenv("APP_THEME") != "" {
 		APP_THEME = os.Getenv("APP_THEME")
-	}
-
-	if os.Getenv("GITHUB_CLIENT_ID") != "" {
-		GITHUB_CLIENT_ID = os.Getenv("GITHUB_CLIENT_ID")
-	}
-
-	if os.Getenv("GITHUB_CLIENT_SECRET") != "" {
-		GITHUB_CLIENT_SECRET = os.Getenv("GITHUB_CLIENT_SECRET")
 	}
 
 	if os.Getenv("COOKIE_UUID") != "" {

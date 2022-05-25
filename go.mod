@@ -26,6 +26,7 @@ require (
 
 require (
 	ariga.io/atlas v0.3.7-0.20220303204946-787354f533c3 // indirect
+	cloud.google.com/go/compute v1.5.0 // indirect
 	github.com/Max-Sum/base32768 v0.0.0-20191205131208-7937843c71d5 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/abbot/go-http-auth v0.4.0 // indirect
@@ -52,7 +53,7 @@ require (
 	github.com/jzelinskie/whirlpool v0.0.0-20201016144138-0675e54bb004 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
-	github.com/mattn/go-colorable v0.1.11 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -94,6 +95,7 @@ require (
 require (
 	ariga.io/sqlcomment v0.0.0-20211020114721-6bb67a62a61a
 	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/dghubble/oauth1 v0.7.1
 	github.com/gofiber/utils v0.1.2
 	github.com/gorilla/feeds v1.1.1
 	github.com/tdewolff/minify/v2 v2.11.1

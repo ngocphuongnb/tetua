@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/utils"
 )
 
@@ -39,11 +38,11 @@ type TopicMutation struct {
 }
 
 func (t *Topic) Url() string {
-	return config.Url(t.Slug)
+	return utils.Url(t.Slug)
 }
 
 func (t *Topic) FeedUrl() string {
-	return config.Url(t.Slug + "/feed")
+	return utils.Url(t.Slug + "/feed")
 }
 
 func GetTopicsTree(topics []*Topic, rootTopic, level int, ignore []int) []*Topic {

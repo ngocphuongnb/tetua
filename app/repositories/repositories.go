@@ -12,6 +12,7 @@ var (
 	File       FileRepository
 	Role       RoleRepository
 	Post       PostRepository
+	Page       PageRepository
 	Topic      TopicRepository
 	User       UserRepository
 	Permission PermissionRepository
@@ -34,6 +35,7 @@ type Repositories struct {
 	File       FileRepository
 	User       UserRepository
 	Post       PostRepository
+	Page       PageRepository
 	Role       RoleRepository
 	Topic      TopicRepository
 	Comment    CommentRepository
@@ -45,6 +47,7 @@ func New(config Repositories) {
 	File = config.File
 	User = config.User
 	Post = config.Post
+	Page = config.Page
 	Role = config.Role
 	Topic = config.Topic
 	Comment = config.Comment

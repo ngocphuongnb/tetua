@@ -16,6 +16,8 @@ type Tx struct {
 	Comment *CommentClient
 	// File is the client for interacting with the File builders.
 	File *FileClient
+	// Page is the client for interacting with the Page builders.
+	Page *PageClient
 	// Permission is the client for interacting with the Permission builders.
 	Permission *PermissionClient
 	// Post is the client for interacting with the Post builders.
@@ -165,6 +167,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Comment = NewCommentClient(tx.config)
 	tx.File = NewFileClient(tx.config)
+	tx.Page = NewPageClient(tx.config)
 	tx.Permission = NewPermissionClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)

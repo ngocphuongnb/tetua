@@ -24,7 +24,7 @@ func Feed(c server.Context) error {
 
 	feed := &feeds.Feed{
 		Title:       config.Setting("app_name"),
-		Link:        &feeds.Link{Href: config.Url("")},
+		Link:        &feeds.Link{Href: utils.Url("")},
 		Description: config.Setting("app_desc"),
 		Author:      &feeds.Author{Name: config.Setting("contact_name"), Email: config.Setting("contact_email")},
 		// Created:     time.Now(),

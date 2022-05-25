@@ -120,6 +120,41 @@ func entPostsToPosts(posts []*ent.Post) []*entities.Post {
 	return result
 }
 
+func entPageToPage(post *ent.Page) *entities.Page {
+	if post == nil {
+		return nil
+	}
+	p := &entities.Page{
+		ID:              post.ID,
+		Name:            post.Name,
+		Slug:            post.Slug,
+		Content:         post.Content,
+		ContentHTML:     post.ContentHTML,
+		Draft:           post.Draft,
+		FeaturedImageID: post.FeaturedImageID,
+		CreatedAt:       &post.CreatedAt,
+		UpdatedAt:       &post.UpdatedAt,
+		DeletedAt:       &post.DeletedAt,
+		FeaturedImage:   &entities.File{},
+	}
+
+	if post.Edges.FeaturedImage != nil {
+		p.FeaturedImage = entFileToFile(post.Edges.FeaturedImage)
+	}
+
+	return p
+}
+
+func entPagesToPages(posts []*ent.Page) []*entities.Page {
+	var result []*entities.Page
+
+	for _, post := range posts {
+		result = append(result, entPageToPage(post))
+	}
+
+	return result
+}
+
 func entRoleToRole(role *ent.Role) *entities.Role {
 	if role == nil {
 		return nil

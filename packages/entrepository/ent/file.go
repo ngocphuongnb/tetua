@@ -44,11 +44,13 @@ type FileEdges struct {
 	User *User `json:"user,omitempty"`
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
+	// Pages holds the value of the pages edge.
+	Pages []*Page `json:"pages,omitempty"`
 	// UserAvatars holds the value of the user_avatars edge.
 	UserAvatars []*User `json:"user_avatars,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -74,10 +76,19 @@ func (e FileEdges) PostsOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "posts"}
 }
 
+// PagesOrErr returns the Pages value or an error if the edge
+// was not loaded in eager-loading.
+func (e FileEdges) PagesOrErr() ([]*Page, error) {
+	if e.loadedTypes[2] {
+		return e.Pages, nil
+	}
+	return nil, &NotLoadedError{edge: "pages"}
+}
+
 // UserAvatarsOrErr returns the UserAvatars value or an error if the edge
 // was not loaded in eager-loading.
 func (e FileEdges) UserAvatarsOrErr() ([]*User, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.UserAvatars, nil
 	}
 	return nil, &NotLoadedError{edge: "user_avatars"}
@@ -176,6 +187,11 @@ func (f *File) QueryUser() *UserQuery {
 // QueryPosts queries the "posts" edge of the File entity.
 func (f *File) QueryPosts() *PostQuery {
 	return (&FileClient{config: f.config}).QueryPosts(f)
+}
+
+// QueryPages queries the "pages" edge of the File entity.
+func (f *File) QueryPages() *PageQuery {
+	return (&FileClient{config: f.config}).QueryPages(f)
 }
 
 // QueryUserAvatars queries the "user_avatars" edge of the File entity.

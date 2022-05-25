@@ -37,6 +37,10 @@ func (File) Edges() []ent.Edge {
 			Annotations(ondeleteSetNull).
 			StorageKey(edge.Column("featured_image_id"), edge.Symbol("post_featured_image")),
 
+		edge.To("pages", Page.Type).
+			Annotations(ondeleteSetNull).
+			StorageKey(edge.Column("featured_image_id"), edge.Symbol("page_featured_image")),
+
 		edge.To("user_avatars", User.Type).
 			Annotations(ondeleteSetNull).
 			StorageKey(edge.Column("avatar_image_id"), edge.Symbol("user_avatar_image")),

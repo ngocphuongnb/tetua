@@ -6,6 +6,7 @@ import (
 	"github.com/ngocphuongnb/tetua/app/server"
 	managecomment "github.com/ngocphuongnb/tetua/app/web/manage/comment"
 	managefile "github.com/ngocphuongnb/tetua/app/web/manage/file"
+	managepage "github.com/ngocphuongnb/tetua/app/web/manage/page"
 	managepost "github.com/ngocphuongnb/tetua/app/web/manage/post"
 	managerole "github.com/ngocphuongnb/tetua/app/web/manage/role"
 	managesetting "github.com/ngocphuongnb/tetua/app/web/manage/setting"
@@ -29,6 +30,10 @@ var (
 	authManageTopicDelete    = manageAuthConfig("manage.topic.delete")
 	authManagePostList       = manageAuthConfig("manage.post.list")
 	authManagePostApprove    = manageAuthConfig("manage.post.approve")
+	authManagePageList       = manageAuthConfig("manage.page.list")
+	authManagePageCompose    = manageAuthConfig("manage.page.compose")
+	authManagePageSave       = manageAuthConfig("manage.page.save")
+	authManagePageDelete     = manageAuthConfig("manage.page.delete")
 	authManageRoleList       = manageAuthConfig("manage.role.list")
 	authManageRoleCompose    = manageAuthConfig("manage.role.compose")
 	authManageRoleSave       = manageAuthConfig("manage.role.save")
@@ -56,6 +61,12 @@ func RegisterRoutes(s server.Server) {
 	post := manage.Group("/posts")
 	post.Get("", managepost.Index, authManagePostList)
 	post.Post("/:id/approve", managepost.Approve, authManagePostApprove)
+
+	page := manage.Group("/pages")
+	page.Get("", managepage.Index, authManagePageList)
+	page.Get("/:id", managepage.Compose, authManagePageCompose)
+	page.Post("/:id", managepage.Save, authManagePageSave)
+	page.Delete("/:id", managepage.Delete, authManagePageDelete)
 
 	role := manage.Group("/roles")
 	role.Get("", managerole.Index, authManageRoleList)

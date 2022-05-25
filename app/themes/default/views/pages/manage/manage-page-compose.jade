@@ -1,0 +1,61 @@
+extends ../../partials/layout.jade
+include ../../partials/common.jade
+
+
+block header
+  !=asset.CssFile('editor/tippy-6.3.7.min.css')
+  !=asset.CssFile('editor/tippy-light-6.3.7.min.css')
+  !=asset.CssFile('editor/style.css')
+
+block footer
+  !=asset.JsFile('editor/highlight-11.5.0.min.js')
+  !=asset.JsFile('editor/editor.js')
+  !=asset.JsFile('js/main.js')
+  script(src='/static/js/manage.js')
+  script listenDeleteNodeEvents('page', '/manage/pages', '/manage/pages')
+  script. new TetuaEditor('.content', {uploadHandler: uploadHandler, disableTitle: true});
+
+block content
+  :go:func ManagePageCompose(page *entities.Page, featuredImage *entities.File)
+  .container
+    form(method='POST' enctype='multipart/form-data')
+      .layout
+        .left
+          .box.fixed-sidebar
+            +manageMenu()
+        .main
+          .box
+            if page.ID > 0
+              h1=page.Name
+            else
+               h1 New page
+           
+            +Messages(meta.Messages)
+            +formInput('name', page.Name, 'Name')
+            +formInput('slug', page.Slug, 'Slug')
+            textarea.content(name='content')=page.Content
+        .right
+          .box.fixed-sidebar
+            .flex
+              +newButton('New Page', '/manage/pages/new')
+            div
+            .save-actions
+              button Save
+              label.switch(for='save-draft')
+                | Draft &nbsp;
+                if page.Draft
+                  input#save-draft(type='checkbox' name='draft' checked='checked')
+                else
+                  input#save-draft(type='checkbox' name='draft')
+                span.slider
+            if page.ID > 0
+              .flex
+                a.btn(target='_blank', href=page.Url()) Preview
+                button.danger.delete-page(data-id=page.ID) Delete
+            div
+              strong Featured Image
+              input(type='hidden' name='featured_image_id' value=page.FeaturedImageID)
+              input.image-input#featured-image(type='file' name='featured_image')
+              .image-upload-previewer(for='featured-image')
+                img(src=featuredImage.Url())
+            +helpCompose()

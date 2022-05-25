@@ -10,3 +10,4 @@ packages/editor/node_modules
 test/*.txt
 test/*.html
 dist/
+.vscode

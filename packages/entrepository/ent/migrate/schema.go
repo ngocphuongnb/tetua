@@ -81,6 +81,45 @@ var (
 			},
 		},
 	}
+	// PagesColumns holds the columns for the "pages" table.
+	PagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "name", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString},
+		{Name: "content", Type: field.TypeString, Size: 2147483647},
+		{Name: "content_html", Type: field.TypeString, Size: 2147483647},
+		{Name: "draft", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "featured_image_id", Type: field.TypeInt, Nullable: true},
+	}
+	// PagesTable holds the schema information for the "pages" table.
+	PagesTable = &schema.Table{
+		Name:       "pages",
+		Columns:    PagesColumns,
+		PrimaryKey: []*schema.Column{PagesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "page_featured_image",
+				Columns:    []*schema.Column{PagesColumns[9]},
+				RefColumns: []*schema.Column{FilesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "name_idx",
+				Unique:  false,
+				Columns: []*schema.Column{PagesColumns[4]},
+			},
+			{
+				Name:    "slug_unique",
+				Unique:  true,
+				Columns: []*schema.Column{PagesColumns[5]},
+			},
+		},
+	}
 	// PermissionsColumns holds the columns for the "permissions" table.
 	PermissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -325,6 +364,7 @@ var (
 	Tables = []*schema.Table{
 		CommentsTable,
 		FilesTable,
+		PagesTable,
 		PermissionsTable,
 		PostsTable,
 		RolesTable,
@@ -346,6 +386,11 @@ func init() {
 	}
 	FilesTable.ForeignKeys[0].RefTable = UsersTable
 	FilesTable.Annotation = &entsql.Annotation{
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
+	}
+	PagesTable.ForeignKeys[0].RefTable = FilesTable
+	PagesTable.Annotation = &entsql.Annotation{
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_unicode_ci",
 	}

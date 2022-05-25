@@ -58,9 +58,10 @@ block content
                     a(href=post.Url() target='_blank')=post.Name
                   div.date=post.CreatedAt.Format("2006-01-02 15:04:05")
                 .info
-                  div.author=fmt.Sprintf("%s", post.User.Username)
+                  div.author=post.User.Username
                   div
-                    a(href=fmt.Sprintf("/posts/%d", post.ID)) Edit
+                    - var postEditUrl = utils.Url(fmt.Sprintf("/posts/%d", post.ID))
+                    a(href=postEditUrl) Edit
                     | &nbsp;&nbsp;
                     a.delete-post(data-id=post.ID href="#") Delete
                     | &nbsp;&nbsp;

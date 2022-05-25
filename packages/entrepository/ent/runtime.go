@@ -7,6 +7,7 @@ import (
 
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/comment"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/file"
+	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/page"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/permission"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/post"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/role"
@@ -54,6 +55,25 @@ func init() {
 	file.DefaultUpdatedAt = fileDescUpdatedAt.Default.(func() time.Time)
 	// file.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	file.UpdateDefaultUpdatedAt = fileDescUpdatedAt.UpdateDefault.(func() time.Time)
+	pageMixin := schema.Page{}.Mixin()
+	pageMixinFields0 := pageMixin[0].Fields()
+	_ = pageMixinFields0
+	pageFields := schema.Page{}.Fields()
+	_ = pageFields
+	// pageDescCreatedAt is the schema descriptor for created_at field.
+	pageDescCreatedAt := pageMixinFields0[0].Descriptor()
+	// page.DefaultCreatedAt holds the default value on creation for the created_at field.
+	page.DefaultCreatedAt = pageDescCreatedAt.Default.(func() time.Time)
+	// pageDescUpdatedAt is the schema descriptor for updated_at field.
+	pageDescUpdatedAt := pageMixinFields0[1].Descriptor()
+	// page.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	page.DefaultUpdatedAt = pageDescUpdatedAt.Default.(func() time.Time)
+	// page.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	page.UpdateDefaultUpdatedAt = pageDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// pageDescDraft is the schema descriptor for draft field.
+	pageDescDraft := pageFields[4].Descriptor()
+	// page.DefaultDraft holds the default value on creation for the draft field.
+	page.DefaultDraft = pageDescDraft.Default.(bool)
 	permissionMixin := schema.Permission{}.Mixin()
 	permissionMixinFields0 := permissionMixin[0].Fields()
 	_ = permissionMixinFields0

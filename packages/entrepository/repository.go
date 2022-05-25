@@ -63,6 +63,7 @@ func New(cfg Config) repositories.Repositories {
 		File:       CreateFileRepository(Client),
 		User:       CreateUserRepository(Client),
 		Post:       CreatePostRepository(Client),
+		Page:       CreatePageRepository(Client),
 		Role:       CreateRoleRepository(Client),
 		Topic:      CreateTopicRepository(Client),
 		Comment:    CreateCommentRepository(Client),

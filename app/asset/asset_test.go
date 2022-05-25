@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/ngocphuongnb/tetua/app/config"
+	"github.com/ngocphuongnb/tetua/app/test"
 	"github.com/ngocphuongnb/tetua/app/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -52,15 +53,21 @@ func TestCssFileLink(t *testing.T) {
 	assert.Equal(t, "<link rel=\"stylesheet\" href=\"/assets/css/style.css\" />", CssFile("css/style.css"))
 }
 
-// func TestCssFileInline(t *testing.T) {
-// 	checkBundledAssets()
-// 	themeDir := "../themes/default"
-// 	config.DEVELOPMENT = false
-// 	assetName := "css/style.css"
-// 	Load(themeDir, true)
-// 	styleFile := getStaticFile(assetName, "css")
-// 	assert.Equal(t, fmt.Sprintf(`<style type="text/css" data-file="%s">%s</style>`, assetName, styleFile.Content), CssFile(assetName))
-// }
+func TestCssFileInline(t *testing.T) {
+	checkBundledAssets()
+	themeDir := "../themes/default"
+	config.DEVELOPMENT = false
+	assetName := "css/inline-file.css"
+
+	bundledAssets = append(bundledAssets, &StaticAsset{Name: assetName, Content: "body{color:red}", Type: "css"})
+	Load(themeDir, true)
+	styleFile := getStaticFile(assetName, "css")
+	assert.Equal(t, fmt.Sprintf(`<style type="text/css" data-file="%s">%s</style>`, assetName, styleFile.Content), CssFile(assetName))
+
+	bundledAssets = utils.SliceFilter(bundledAssets, func(asset *StaticAsset) bool {
+		return asset.Name != assetName
+	})
+}
 
 func TestJsFileLink(t *testing.T) {
 	checkBundledAssets()
@@ -85,11 +92,11 @@ func TestOtherFileLink(t *testing.T) {
 	themeDir := "../themes/default"
 	config.DEVELOPMENT = true
 	Load(themeDir, true)
-	assert.Equal(t, config.Url("/assets/images/favicon.356933f5.png"), OtherFile("images/favicon.356933f5.png"))
+	assert.Equal(t, utils.Url("/assets/images/sample-image-file.png"), OtherFile("images/sample-image-file.png"))
 }
 
 func TestPanicInvalidThemeDir(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "open ../themes/notfound/theme.json: no such file or directory", "theme error")
+	defer test.RecoverPanic(t, "open ../themes/notfound/theme.json: no such file or directory", "theme error")
 	themeDir := "../themes/notfound"
 	Load(themeDir, true)
 }
@@ -124,7 +131,7 @@ func TestAssetFunctions(t *testing.T) {
 }
 
 func TestPanicInvalidThemeFile(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "unexpected end of JSON input", "theme error")
+	defer test.RecoverPanic(t, "unexpected end of JSON input", "theme error")
 	themeDir, err := ioutil.TempDir("../../private/tmp", "theme-")
 
 	if err != nil {
@@ -143,7 +150,7 @@ func TestPanicInvalidThemeFile(t *testing.T) {
 }
 
 func TestAssets(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "syntax error in pattern", "theme error")
+	defer test.RecoverPanic(t, "syntax error in pattern", "theme error")
 	themeDir, err := ioutil.TempDir("../../private/tmp", "theme-")
 
 	if err != nil {

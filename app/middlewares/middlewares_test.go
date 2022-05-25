@@ -12,6 +12,7 @@ import (
 	"github.com/ngocphuongnb/tetua/app/middlewares"
 	"github.com/ngocphuongnb/tetua/app/mock"
 	"github.com/ngocphuongnb/tetua/app/server"
+	fiber "github.com/ngocphuongnb/tetua/packages/fiberserver"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,14 +34,27 @@ func TestRecoverMiddleware(t *testing.T) {
 	mockServer.Get("/test", func(c server.Context) error {
 		panic("test recover")
 	})
-	mockServer.Get("/test2", func(c server.Context) error {
-		return c.SendString("ok")
-	})
 	body, _ := mock.GetRequest(mockServer, "/test")
-
 	assert.Equal(t, `{"error":"test recover"}`, body)
 	param0Str := fmt.Sprintf("%v", mockLogger.Last().Params[0])
 	assert.Equal(t, true, strings.HasPrefix(param0Str, "test recover goroutine"))
+}
+
+func TestRecoverMiddlewareResponseError(t *testing.T) {
+	mockLogger := mock.CreateLogger(true)
+	mockServer := fiber.New(fiber.Config{
+		JwtSigningKey: "sesj5JYrRxrB2yUWkBFM7KKWCY2ykxBw",
+		JSONEncoder: func(v interface{}) ([]byte, error) {
+			return nil, errors.New("json error")
+		},
+	})
+
+	mockServer.Use(middlewares.Recover)
+	mockServer.Get("/test", func(c server.Context) error {
+		panic("test recover")
+	})
+	mock.GetRequest(mockServer, "/test")
+	assert.Equal(t, errors.New("json error"), mockLogger.Last().Params[0])
 }
 
 func TestRequestIDMiddlewares(t *testing.T) {

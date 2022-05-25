@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ngocphuongnb/tetua/app/test"
 	"github.com/ngocphuongnb/tetua/app/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -64,7 +65,7 @@ func TestGenerateHash(t *testing.T) {
 
 func TestGetFunctionName(t *testing.T) {
 	assert.Equal(t, true, strings.HasSuffix(utils.GetFunctionName(TestGenerateHash), "utils_test.TestGenerateHash"))
-	defer utils.RecoverTestPanic(t, "reflect: call of reflect.Value.Pointer on zero Value", "nil input")
+	defer test.RecoverPanic(t, "reflect: call of reflect.Value.Pointer on zero Value", "nil input")
 	assert.Equal(t, "", utils.GetFunctionName(nil))
 }
 
@@ -95,16 +96,16 @@ func TestSliceAppendIfNotExists(t *testing.T) {
 }
 
 func TestRecoverPanic(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "panic", "panic")
+	defer test.RecoverPanic(t, "panic", "panic")
 	panic("panic")
 }
 
 func TestGetRootDir(t *testing.T) {
-	assert.Equal(t, true, strings.HasSuffix(utils.GetRootDir(), "go/src/testing"))
+	assert.Equal(t, true, strings.HasSuffix(test.GetRootDir(), "go/src/testing"))
 }
 
 func TestCreateTestDir(t *testing.T) {
-	dir := utils.CreateTestDir("testing-dir-")
+	dir := test.CreateDir("testing-dir-")
 	defer os.RemoveAll(dir)
 	assert.Equal(t, true, strings.Contains(dir, "testing-dir-"))
 }

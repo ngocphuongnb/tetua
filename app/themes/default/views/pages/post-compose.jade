@@ -19,7 +19,7 @@ block content
       .layout.two-right
         .main
           +Messages(meta.Messages)
-          textarea.content(name='content' spellcheck='false')=post.Name + "\n" + post.Content
+          textarea.content(name='content')=post.Name + "\n" + post.Content
         .right
           .box.fixed-sidebar
             .save-actions
@@ -41,4 +41,3 @@ block content
               .image-upload-previewer(for='featured-image')
                 img(src=featuredImage.Url())
             +helpCompose()
-

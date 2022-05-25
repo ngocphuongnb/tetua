@@ -2,25 +2,24 @@ package utils
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	mathrand "math/rand"
+	"io"
 	"net/url"
-	"path"
-	"path/filepath"
 	"reflect"
 	"runtime"
 	"strings"
-	"testing"
 
 	h "html"
 
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/stretchr/testify/assert"
+	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
@@ -116,16 +115,6 @@ func MarkdownToHtml(content string) (string, error) {
 	return buf.String(), nil
 }
 
-func RandomString(n int) string {
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-	s := make([]rune, n)
-	for i := range s {
-		s[i] = letters[mathrand.Intn(len(letters))]
-	}
-	return string(s)
-}
-
 func GenerateHash(input string) (string, error) {
 	if input == "" {
 		return "", errors.New("hash: input cannot be empty")
@@ -184,6 +173,83 @@ func CheckHash(input, hash string) error {
 	}
 
 	return nil
+}
+
+func Encrypt(stringToEncrypt string, keys ...string) (string, error) {
+	key := []byte(config.APP_KEY)
+
+	if len(keys) > 0 {
+		key = []byte(keys[0])
+	}
+
+	plaintext := []byte(stringToEncrypt)
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", err
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+
+	nonce := make([]byte, aesGCM.NonceSize())
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		return "", err
+	}
+
+	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
+	return fmt.Sprintf("%x", ciphertext), nil
+}
+
+func Decrypt(encryptedString string, keys ...string) (string, error) {
+	key := []byte(config.APP_KEY)
+	if len(keys) > 0 {
+		key = []byte(keys[0])
+	}
+
+	enc, err := hex.DecodeString(encryptedString)
+
+	if err != nil {
+		return "", err
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", err
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+
+	if len(enc) < aesGCM.NonceSize() {
+		return "", errors.New("ciphertext too short")
+	}
+
+	nonceSize := aesGCM.NonceSize()
+	nonce, ciphertext := enc[:nonceSize], enc[nonceSize:]
+
+	plaintext, err := aesGCM.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s", plaintext), nil
+}
+
+func Url(path string) string {
+	appBase := strings.TrimRight(config.Setting("app_base_url"), "/")
+
+	if path == "" {
+		return appBase + "/"
+	}
+
+	path = strings.TrimLeft(path, "/")
+	path = fmt.Sprintf("%s/%s", appBase, path)
+	return path
 }
 
 func GetFunctionName(i interface{}) string {
@@ -245,36 +311,6 @@ func SliceAppendIfNotExists[T comparable](slice []T, newItem T, checkExists func
 	}
 	slice = append(slice, newItem)
 	return slice
-}
-
-func RecoverTestPanic(t *testing.T, expected string, msgs ...string) {
-	msg := ""
-	if len(msgs) > 0 {
-		msg = "should panic on " + msgs[0]
-	}
-	if rs := recover(); rs != nil {
-		if err, ok := rs.(error); ok && err != nil {
-			assert.Equal(t, expected, err.Error(), msg)
-		} else {
-			assert.Equal(t, expected, rs, msg)
-		}
-	}
-}
-
-// GetRootDir return the root directory of the project
-func GetRootDir() string {
-	_, mainFile, _, _ := runtime.Caller(2)
-	return filepath.Dir(mainFile)
-}
-
-// CreateTestDir creates a temporary directory for testing
-func CreateTestDir(prefix string) string {
-	tmpDir := path.Join(path.Dir(path.Dir(GetRootDir())), "private/tmp")
-	dir, err := ioutil.TempDir(tmpDir, prefix)
-	if err != nil {
-		panic(err)
-	}
-	return dir
 }
 
 // GetStructField returns the value of a struct field

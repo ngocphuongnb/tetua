@@ -5,7 +5,7 @@ import (
 
 	"github.com/ngocphuongnb/tetua/app/fs"
 	"github.com/ngocphuongnb/tetua/app/mock"
-	"github.com/ngocphuongnb/tetua/app/utils"
+	"github.com/ngocphuongnb/tetua/app/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,13 +18,13 @@ func (d *Disk2) Name() string {
 }
 
 func TestNewNoDisk(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "No disk found")
+	defer test.RecoverPanic(t, "No disk found")
 	fs.New("", nil)
 	assert.Equal(t, 1, 1)
 }
 
 func TestNewNoDefaultDisk(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "No default disk found")
+	defer test.RecoverPanic(t, "No default disk found")
 	fs.New("", []fs.FSDisk{&mock.Disk{}})
 	assert.Equal(t, 1, 1)
 }

@@ -17,9 +17,10 @@ import { Link } from './link';
 import { CodeBlock } from './codeblock';
 import { TetuaEditorProps } from '..';
 import { getImageExtension } from './image';
+import { Extensions } from '@tiptap/core';
 
 export function getExtensions(props: TetuaEditorProps) {
-  return [
+  const extensions: Extensions =  [
     Highlight,
     Typography,
     getImageExtension({
@@ -33,9 +34,6 @@ export function getExtensions(props: TetuaEditorProps) {
     TaskList,
     CodeBlock,
     QuickEdit.configure(),
-    Document.extend({
-      content: 'heading block*',
-    }),
     TaskItem.configure({
       nested: true,
     }),
@@ -63,9 +61,19 @@ export function getExtensions(props: TetuaEditorProps) {
           }
         }
 
-        return 'Type something here...';
+        return 'Start typing something...';
       },
-    }),
-  ]
+    })
+  ];
+
+  if (!props.disableTitle) {
+    extensions.push(Document.extend({
+      content: 'heading block*',
+    }));
+  } else {
+    extensions.push(Document);
+  }
+
+  return extensions;
 }
 

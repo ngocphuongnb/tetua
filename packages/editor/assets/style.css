@@ -63,7 +63,8 @@ body {
   max-width: 100%;
   padding: 5px;
   background: #fff;
-margin-bottom: 20px;}
+  margin-bottom: 20px;
+}
 .mely-editor.mely-editor-small .mely-editor-menu-container {
   display: block;
 }
@@ -91,11 +92,9 @@ margin-bottom: 20px;}
 }
 
 .mely-editor-content {
-  min-height: 500px;
   padding: 10px 15px;
   border-radius: 5px;
   position: relative;
-  /* overflow: auto; */
   background: #fff;
 }
 
@@ -142,6 +141,8 @@ margin-bottom: 20px;}
   border: none;
   outline: none;
   box-shadow: none;
+  height: 100%;
+  min-height: 300px;
 }
 .mely-editor-menu-container {
   position: sticky;
@@ -151,7 +152,8 @@ margin-bottom: 20px;}
   align-items: center;
   width: 100%;
   background: #fff;
-height: 58px;}
+  min-height: 58px;
+}
 
 /** Table **/
 .ProseMirror table {
@@ -499,9 +501,11 @@ button.btn.has-sub-menu > svg:first-child {
 .mely-editor-block {
   text-align: center;
   border: 1px solid transparent;
-  
+
   margin: 20px 0;
-font-size: initial;font-weight: initial;}
+  font-size: initial;
+  font-weight: initial;
+}
 .mely-editor-block.block-img.uploading {
   position: relative;
 }
@@ -531,7 +535,9 @@ font-size: initial;font-weight: initial;}
 .mely-editor-block-view input {
   background: #fff;
   caret-color: initial;
-line-height: 1;padding: .25rem .75rem;}
+  line-height: 1;
+  padding: 0.25rem 0.75rem;
+}
 
 .mely-editor-block-view p {
   margin: 5px 0;

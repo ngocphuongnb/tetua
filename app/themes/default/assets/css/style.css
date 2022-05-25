@@ -135,6 +135,11 @@ body.show-menu div.overlay {
   padding: var(--layout-gap) 0 0;
 }
 
+.layout.single {
+  display: block;
+  max-width: 800px;
+  margin: auto;
+}
 .layout.two-right {
   grid-template-columns: minmax(0, 2fr) 320px;
 }
@@ -282,6 +287,12 @@ button.danger {
 .multi-checkbox .name {
   display: inline-block;
   margin-left: 10px;
+}
+label.required:after {
+  content: "*";
+  display: inline-block;
+  margin-left: 5px;
+  color: red;
 }
 
 /** Main nav **/
@@ -614,6 +625,8 @@ ul.messages .error {
 .login ul.socials {
   list-style: none;
   padding: 0;
+  display: grid;
+  gap: 10px;
 }
 .login ul.socials li a {
   display: block;
@@ -682,6 +695,14 @@ ul.messages .error {
   font-size: 0.9rem;
   line-height: 1.125;
   color: var(--b-txt);
+}
+
+/** Page detail **/
+article.page-detail .meta {
+  font-size: 0.96rem;
+}
+article.page-detail h1 {
+  margin-top: 1rem;
 }
 
 /** Manage **/

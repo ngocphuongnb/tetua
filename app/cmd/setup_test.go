@@ -9,7 +9,7 @@ import (
 	"github.com/ngocphuongnb/tetua/app/mock"
 	"github.com/ngocphuongnb/tetua/app/repositories"
 	"github.com/ngocphuongnb/tetua/app/server"
-	"github.com/ngocphuongnb/tetua/app/utils"
+	"github.com/ngocphuongnb/tetua/app/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,14 +22,14 @@ func init() {
 
 func TestFindRoleError(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "query_error", "true")
-	defer utils.RecoverTestPanic(t, "ByName error", "ByName error")
+	defer test.RecoverPanic(t, "ByName error", "ByName error")
 
 	createRole(auth.ROLE_ADMIN, ctx)
 }
 
 func TestCreateRoleError(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "create_error", "true")
-	defer utils.RecoverTestPanic(t, "Error create role", "Error create role")
+	defer test.RecoverPanic(t, "Error create role", "Error create role")
 
 	createRole(auth.ROLE_ADMIN, ctx)
 }
@@ -46,19 +46,19 @@ func TestCreatePermission(t *testing.T) {
 	assert.Equal(t, "test.action", createdPerm.Action)
 	assert.Equal(t, string(entities.PERM_ALL), createdPerm.Value)
 
-	defer utils.RecoverTestPanic(t, "Error create permission", "Error create permission")
+	defer test.RecoverPanic(t, "Error create permission", "Error create permission")
 	ctx := context.WithValue(context.Background(), "create_error", "true")
 	createPermission(auth.ROLE_ADMIN, "test.action", entities.PERM_ALL, ctx)
 }
 
 func TestSetupCreateUserFailed(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "Error create user", "Error create user")
+	defer test.RecoverPanic(t, "Error create user", "Error create user")
 	ctx := context.WithValue(context.Background(), "create_error", "true")
 	Setup("test_setup_user", "test_setup_password", ctx)
 }
 
 func TestSetupCreateUserEmptyPassword(t *testing.T) {
-	defer utils.RecoverTestPanic(t, "hash: input cannot be empty", "hash: input cannot be empty")
+	defer test.RecoverPanic(t, "hash: input cannot be empty", "hash: input cannot be empty")
 	Setup("test_setup_user", "")
 }
 
@@ -90,7 +90,7 @@ func TestSetup(t *testing.T) {
 	lastLoggerIndex := len(mockLogger.Messages) - 1
 	assert.Equal(t, mockLogger.Messages[lastLoggerIndex].Params[0], "Root user existed, skip setup")
 
-	defer utils.RecoverTestPanic(t, "ByUsername error", "ByUsername error")
+	defer test.RecoverPanic(t, "ByUsername error", "ByUsername error")
 	ctx := context.WithValue(context.Background(), "query_error", "true")
 	Setup("test_setup_user", "test_setup_password", ctx)
 

@@ -9,6 +9,7 @@ import (
 	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/entities"
 	"github.com/ngocphuongnb/tetua/app/server"
+	"github.com/ngocphuongnb/tetua/app/utils"
 )
 
 func Check(c server.Context) error {
@@ -46,7 +47,7 @@ func Check(c server.Context) error {
 			Expires: time.Now().Add(time.Hour * 100 * 365 * 24),
 		})
 
-		return c.Redirect(config.Url("/inactive"))
+		return c.Redirect(utils.Url("/inactive"))
 	}
 
 	// Check all user roles for this action

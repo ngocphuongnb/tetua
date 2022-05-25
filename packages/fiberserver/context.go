@@ -14,6 +14,7 @@ import (
 	"github.com/ngocphuongnb/tetua/app/entities"
 	"github.com/ngocphuongnb/tetua/app/logger"
 	"github.com/ngocphuongnb/tetua/app/server"
+	"github.com/ngocphuongnb/tetua/app/utils"
 	"github.com/valyala/fasthttp"
 )
 
@@ -88,7 +89,7 @@ func (c *Context) Meta(metas ...*entities.Meta) *entities.Meta {
 
 func (c *Context) Render(fn func(meta *entities.Meta, wr *bufio.Writer)) error {
 	if c.Meta().Canonical == "" {
-		c.Meta().Canonical = config.Url(c.Path())
+		c.Meta().Canonical = utils.Url(c.Path())
 	}
 
 	if c.Meta().Type == "" {

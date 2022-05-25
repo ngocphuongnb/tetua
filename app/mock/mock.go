@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/ngocphuongnb/tetua/app/auth"
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/logger"
 	"github.com/ngocphuongnb/tetua/app/server"
 	fiber "github.com/ngocphuongnb/tetua/packages/fiberserver"
@@ -34,7 +33,7 @@ func CreateServer() server.Server {
 	if logger.Get() == nil {
 		CreateLogger()
 	}
-	s := fiber.New(fiber.Config{JwtSigningKey: config.APP_KEY})
+	s := fiber.New(fiber.Config{JwtSigningKey: "sesj5JYrRxrB2yUWkBFM7KKWCY2ykxBw"})
 	s.Use(auth.AssignUserInfo)
 	s.Use(auth.Check)
 

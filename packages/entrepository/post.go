@@ -127,7 +127,7 @@ func CreatePostRepository(client *ent.Client) *PostRepository {
 				return uq.Save(ctx)
 			},
 			QueryFilterFn: func(client *ent.Client, filters ...*e.PostFilter) *ent.PostQuery {
-				query := client.Post.Query()
+				query := client.Post.Query().Where(post.DeletedAtIsNil())
 				publish := "published"
 				approved := "approved"
 

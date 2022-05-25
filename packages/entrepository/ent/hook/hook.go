@@ -35,6 +35,19 @@ func (f FileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return f(ctx, mv)
 }
 
+// The PageFunc type is an adapter to allow the use of ordinary
+// function as Page mutator.
+type PageFunc func(context.Context, *ent.PageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.PageMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PageMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The PermissionFunc type is an adapter to allow the use of ordinary
 // function as Permission mutator.
 type PermissionFunc func(context.Context, *ent.PermissionMutation) (ent.Value, error)

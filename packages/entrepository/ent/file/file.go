@@ -31,6 +31,8 @@ const (
 	EdgeUser = "user"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
+	// EdgePages holds the string denoting the pages edge name in mutations.
+	EdgePages = "pages"
 	// EdgeUserAvatars holds the string denoting the user_avatars edge name in mutations.
 	EdgeUserAvatars = "user_avatars"
 	// Table holds the table name of the file in the database.
@@ -49,6 +51,13 @@ const (
 	PostsInverseTable = "posts"
 	// PostsColumn is the table column denoting the posts relation/edge.
 	PostsColumn = "featured_image_id"
+	// PagesTable is the table that holds the pages relation/edge.
+	PagesTable = "pages"
+	// PagesInverseTable is the table name for the Page entity.
+	// It exists in this package in order to avoid circular dependency with the "page" package.
+	PagesInverseTable = "pages"
+	// PagesColumn is the table column denoting the pages relation/edge.
+	PagesColumn = "featured_image_id"
 	// UserAvatarsTable is the table that holds the user_avatars relation/edge.
 	UserAvatarsTable = "users"
 	// UserAvatarsInverseTable is the table name for the User entity.

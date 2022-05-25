@@ -1,14 +1,13 @@
 package managepost
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/entities"
 	e "github.com/ngocphuongnb/tetua/app/entities"
 	"github.com/ngocphuongnb/tetua/app/repositories"
 	"github.com/ngocphuongnb/tetua/app/server"
+	"github.com/ngocphuongnb/tetua/app/utils"
 	"github.com/ngocphuongnb/tetua/views"
 )
 
@@ -23,8 +22,6 @@ func Index(c server.Context) error {
 	userIDs := []int{}
 	status := http.StatusOK
 	topics, err := repositories.Topic.All(c.Context())
-
-	fmt.Println(approve)
 
 	if topicID > 0 {
 		topicIDs = append(topicIDs, topicID)
@@ -43,7 +40,7 @@ func Index(c server.Context) error {
 		TopicIDs: topicIDs,
 		UserIDs:  userIDs,
 		Filter: &entities.Filter{
-			BaseUrl: config.Url("/manage/posts"),
+			BaseUrl: utils.Url("/manage/posts"),
 			Page:    page,
 			Search:  search,
 		}})

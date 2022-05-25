@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/file"
+	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/page"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/post"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/predicate"
 	"github.com/ngocphuongnb/tetua/packages/entrepository/ent/user"
@@ -30,6 +31,7 @@ type FileQuery struct {
 	// eager-loading edges.
 	withUser        *UserQuery
 	withPosts       *PostQuery
+	withPages       *PageQuery
 	withUserAvatars *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -104,6 +106,28 @@ func (fq *FileQuery) QueryPosts() *PostQuery {
 			sqlgraph.From(file.Table, file.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, file.PostsTable, file.PostsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPages chains the current query on the "pages" edge.
+func (fq *FileQuery) QueryPages() *PageQuery {
+	query := &PageQuery{config: fq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := fq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := fq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(file.Table, file.FieldID, selector),
+			sqlgraph.To(page.Table, page.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, file.PagesTable, file.PagesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
 		return fromU, nil
@@ -316,6 +340,7 @@ func (fq *FileQuery) Clone() *FileQuery {
 		predicates:      append([]predicate.File{}, fq.predicates...),
 		withUser:        fq.withUser.Clone(),
 		withPosts:       fq.withPosts.Clone(),
+		withPages:       fq.withPages.Clone(),
 		withUserAvatars: fq.withUserAvatars.Clone(),
 		// clone intermediate query.
 		sql:    fq.sql.Clone(),
@@ -343,6 +368,17 @@ func (fq *FileQuery) WithPosts(opts ...func(*PostQuery)) *FileQuery {
 		opt(query)
 	}
 	fq.withPosts = query
+	return fq
+}
+
+// WithPages tells the query-builder to eager-load the nodes that are connected to
+// the "pages" edge. The optional arguments are used to configure the query builder of the edge.
+func (fq *FileQuery) WithPages(opts ...func(*PageQuery)) *FileQuery {
+	query := &PageQuery{config: fq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	fq.withPages = query
 	return fq
 }
 
@@ -422,9 +458,10 @@ func (fq *FileQuery) sqlAll(ctx context.Context) ([]*File, error) {
 	var (
 		nodes       = []*File{}
 		_spec       = fq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			fq.withUser != nil,
 			fq.withPosts != nil,
+			fq.withPages != nil,
 			fq.withUserAvatars != nil,
 		}
 	)
@@ -496,6 +533,31 @@ func (fq *FileQuery) sqlAll(ctx context.Context) ([]*File, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "featured_image_id" returned %v for node %v`, fk, n.ID)
 			}
 			node.Edges.Posts = append(node.Edges.Posts, n)
+		}
+	}
+
+	if query := fq.withPages; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*File)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Pages = []*Page{}
+		}
+		query.Where(predicate.Page(func(s *sql.Selector) {
+			s.Where(sql.InValues(file.PagesColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.FeaturedImageID
+			node, ok := nodeids[fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "featured_image_id" returned %v for node %v`, fk, n.ID)
+			}
+			node.Edges.Pages = append(node.Edges.Pages, n)
 		}
 	}
 

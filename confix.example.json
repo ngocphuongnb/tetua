@@ -1,0 +1,53 @@
+{
+  "app_env": "production",
+  "app_key": "app_key_32_bytes",
+  "app_base_url": "http://localhost:3000",
+  "db_dsn": "root:123@tcp(127.0.0.1:3306)/tetua?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true",
+  "db_query_logging": false,
+  "show_tetua_block": true,
+  "mail": {
+    "sender": "sender@site.local",
+    "smtp": {
+      "host": "smtp.service.local",
+      "port": 465,
+      "secure": true,
+      "user": "sender@site.local",
+      "pass": "smtp_password"
+    }
+  },
+  "auth": {
+    "enabled_providers": ["github", "google", "twitter"],
+    "providers": {
+      "github": {
+        "client_id": "github_client_id",
+        "client_secret": "github_client_secret"
+      },
+      "google": {
+        "client_id": "google_client_id",
+        "client_secret": "google_client_secret"
+      },
+      "twitter": {
+        "consumer_key": "twitter_consumer_key",
+        "consumer_secret": "twitter_consumer_secret"
+      }
+    }
+  },
+  "storage": {
+    "default_disk": "my_s3_disk",
+    "disks": [
+      {
+        "name": "my_s3_disk",
+        "driver": "s3",
+        "root": "/files",
+        "provider": "DigitalOcean",
+        "endpoint": "sfo3.digitaloceanspaces.com",
+        "region": "sfo3",
+        "bucket": "my_bucket",
+        "access_key_id": "s3_access_key_id",
+        "secret_access_key": "s3_secret_access_key",
+        "base_url": "https://cdn.site.local",
+        "acl": "public-read"
+      }
+    ]
+  }
+}

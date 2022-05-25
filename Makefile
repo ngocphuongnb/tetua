@@ -13,7 +13,7 @@ build_app:
 
 test_all:
 	echo "Testing..."
-	go test ./...
+	go test -coverprofile ./test/coverage.txt ./... && go tool cover -html=./test/coverage.txt -o ./test/coverage.html
 
 prerelease: build_app test_all
 

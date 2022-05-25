@@ -103,11 +103,11 @@ func FileOwnerCheck(c server.Context) bool {
 	user := c.User()
 	file, ok := c.Locals("file").(*entities.File)
 
-	if user == nil || file == nil {
+	if !ok {
 		return false
 	}
 
-	if !ok {
+	if user == nil || file == nil {
 		return false
 	}
 
@@ -146,11 +146,11 @@ func CommentOwnerCheck(c server.Context) bool {
 	user := c.User()
 	comment, ok := c.Locals("comment").(*entities.Comment)
 
-	if user == nil || comment == nil {
+	if !ok {
 		return false
 	}
 
-	if !ok {
+	if user == nil || comment == nil {
 		return false
 	}
 

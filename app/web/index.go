@@ -6,10 +6,10 @@ import (
 	"sync"
 
 	"github.com/ngocphuongnb/tetua/app/cache"
-	"github.com/ngocphuongnb/tetua/app/config"
 	"github.com/ngocphuongnb/tetua/app/entities"
 	"github.com/ngocphuongnb/tetua/app/repositories"
 	"github.com/ngocphuongnb/tetua/app/server"
+	"github.com/ngocphuongnb/tetua/app/utils"
 	"github.com/ngocphuongnb/tetua/views"
 )
 
@@ -61,7 +61,7 @@ func Search(c server.Context) (err error) {
 	if searchQuery != "" {
 		c.Meta().Query = searchQuery
 		c.Meta().Title = searchQuery + " - Search result for " + searchQuery
-		c.Meta().Canonical = config.Url(c.Path() + "?q=" + url.QueryEscape(searchQuery))
+		c.Meta().Canonical = utils.Url(c.Path() + "?q=" + url.QueryEscape(searchQuery))
 	}
 
 	paginate, err = repositories.Post.Paginate(c.Context(), &entities.PostFilter{

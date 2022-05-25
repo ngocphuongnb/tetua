@@ -1,0 +1,29 @@
+extends ../partials/layout.jade
+
+block content
+  :go:func Register(username, email string)
+  .container
+    .layout
+      .left
+      .main
+        .box.login
+          h1.text-center Register
+          +Messages(meta.Messages)
+          form(action=utils.Url("/register"), method="post")
+            p
+              label.required Username
+              input(type="text", name="username", placeholder="Username" value=username)
+            p
+              label.required Email
+              input(type="email", name="email", placeholder="Email" value=email)
+            p
+              label.required Password
+              input(type="password", name="password", placeholder="Password")
+            p
+              label.required Password confirmation
+              input(type="password", name="passwordconfirmation", placeholder="Password confirmation")
+            div
+              button.btn.btn-primary(type="submit" style="background: #313131") Register
+              | &nbsp;&nbsp;
+              a(href="#") Login
+      .right

@@ -54,12 +54,6 @@ func (f *File) Delete(ctx context.Context) error {
 type FileFilter struct {
 	*Filter
 	UserIDs []int `form:"user_ids" json:"user_ids"`
-	// Search          string   `form:"search" json:"search"`
-	// Page            int      `form:"page" json:"page"`
-	// Limit           int      `form:"limit" json:"limit"`
-	// Sorts           []*Sort  `form:"orders" json:"orders"`
-	// IgnoreUrlParams []string `form:"ignore_url_params" json:"ignore_url_params"`
-	// ExcludeIDs      []int    `form:"exclude_ids" json:"exclude_ids"`
 }
 
 func (p *FileFilter) Base() string {
