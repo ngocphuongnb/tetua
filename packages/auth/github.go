@@ -162,7 +162,7 @@ func (g *GithubAuthProvider) Callback(c server.Context) (u *entities.User, err e
 	return &entities.User{
 		Provider:         "github",
 		ProviderID:       utils.SanitizePlainText(strconv.Itoa(githubUser.ID)),
-		Username:         utils.SanitizePlainText("github_" + strconv.Itoa(githubUser.ID) + "_" + githubUser.Login),
+		Username:         utils.SanitizePlainText(githubUser.Login),
 		Email:            utils.SanitizePlainText(githubUser.Email),
 		ProviderAvatar:   utils.SanitizePlainText(githubUser.AvatarURL),
 		DisplayName:      utils.SanitizePlainText(githubUser.Name),

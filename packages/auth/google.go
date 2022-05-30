@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/ngocphuongnb/tetua/app/auth"
 	"github.com/ngocphuongnb/tetua/app/config"
@@ -100,7 +101,7 @@ func (g *GoogleAuthProvider) Callback(c server.Context) (u *entities.User, err e
 	return &entities.User{
 		Provider:         "google",
 		ProviderID:       utils.SanitizePlainText(googleUser.ID),
-		Username:         utils.SanitizePlainText("google_" + googleUser.ID + "_" + googleUser.Email),
+		Username:         utils.SanitizePlainText(strings.Split(googleUser.Email, "@gmail")[0]),
 		Email:            utils.SanitizePlainText(googleUser.Email),
 		ProviderAvatar:   utils.SanitizePlainText(googleUser.Picture),
 		DisplayName:      utils.SanitizePlainText(googleUser.Name),

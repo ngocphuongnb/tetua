@@ -97,7 +97,7 @@ func (g *TwitterAuthProvider) Callback(c server.Context) (u *entities.User, err 
 	return &entities.User{
 		Provider:         "twitter",
 		ProviderID:       utils.SanitizePlainText(userResponse.IDStr),
-		Username:         utils.SanitizePlainText("twitter_" + userResponse.IDStr + "_" + userResponse.ScreenName),
+		Username:         utils.SanitizePlainText(userResponse.ScreenName),
 		Email:            utils.SanitizePlainText(userResponse.Email),
 		ProviderAvatar:   utils.SanitizePlainText(userResponse.ProfileImageUrlHttps),
 		DisplayName:      utils.SanitizePlainText(userResponse.Name),
